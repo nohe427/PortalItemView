@@ -28,7 +28,7 @@ public class FeatureItem {
         return mBitmap;
     }
 
-    /*public String getPortalItemURL(){
-       // return mPortalItem.get
-    }*/
+    public PortalItem getPortalItem(){
+      return mPortalItem;
+    }
 }

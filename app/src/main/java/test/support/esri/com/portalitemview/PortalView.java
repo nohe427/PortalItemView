@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,7 +63,7 @@ public class PortalView extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.portalview);
         mapView = (MapView)findViewById(R.id.map_view);
-        map = new Map(Basemap.createImageryWithLabels());
+        map = new Map(Basemap.createLightGrayCanvas());
         mapView.setMap(map);
         Point point = new Point(-9217274.228, 4257236.677, SpatialReference.create(102100));
         mapView.setViewpointCenterAsync(point);
@@ -134,6 +135,7 @@ public class PortalView extends AppCompatActivity{
                                     mLinearLayout = new LinearLayoutManager(getApplicationContext());
                                     recyclerView.setLayoutManager(mLinearLayout);
                                     recyclerView.setAdapter(mAdapter);
+
                                 }
                             });
                         }
