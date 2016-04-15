@@ -11,10 +11,17 @@
     tools:showIn="@layout/portalview"
     android:orientation="vertical"
     android:weightSum="1">
-
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:popupTheme="@style/ThemeOverlay.AppCompat.Light"></android.support.v7.widget.Toolbar>
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="418dp">
+
         <com.esri.arcgisruntime.mapping.view.MapView
             android:id="@+id/map_view"
             android:layout_width="match_parent"
@@ -34,6 +41,7 @@
         android:padding="@dimen/abc_control_inset_material">
 
     </android.support.v7.widget.RecyclerView>
+
 
 
     </RelativeLayout>

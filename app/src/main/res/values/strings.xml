@@ -9,4 +9,8 @@
     <string name="title_activity_portal_view">PortalView</string>
     <string name="logout">Log out</string>
     <string name="copyright">(c) 2016 esri support Quartz beta test</string>
+    <string name="title_activity_navigator">Navigator</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>
