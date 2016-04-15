@@ -13,7 +13,7 @@
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_3d_rotation_black_24dp"
-            android:title="3D" />
+            android:title="3D Maps" />
         <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_place_black_24dp"
