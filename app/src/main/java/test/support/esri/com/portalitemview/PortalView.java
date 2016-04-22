@@ -1,50 +1,39 @@
 package test.support.esri.com.portalitemview;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
-import com.esri.arcgisruntime.geometry.Envelope;
-import com.esri.arcgisruntime.geometry.Point;
-import com.esri.arcgisruntime.geometry.SpatialReference;
 import com.esri.arcgisruntime.loadable.LoadStatus;
-import com.esri.arcgisruntime.mapping.Basemap;
-import com.esri.arcgisruntime.mapping.Viewpoint;
-import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.mapping.Map;
+import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.portal.Portal;
 import com.esri.arcgisruntime.portal.PortalInfo;
 import com.esri.arcgisruntime.portal.PortalItem;
-import com.esri.arcgisruntime.portal.PortalItemType;
 import com.esri.arcgisruntime.portal.PortalQueryParams;
 import com.esri.arcgisruntime.portal.PortalQueryResultSet;
 import com.esri.arcgisruntime.security.UserCredential;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
  * Created by kwas7493 on 4/1/2016.
  */
-public class PortalView extends AppCompatActivity{
+public class PortalView extends AppCompatActivity implements RecyclerFragment.OnFragmentInteractionListener{
     private MapView mapView;
     private Map map;
     private ImageButton portalimagebutton;
@@ -56,8 +45,8 @@ public class PortalView extends AppCompatActivity{
     private LinearLayoutManager mLinearLayout;
     private static String USERNAME;
     private static String PASSWORD;
-    private static final String TAG = "PortalView";
     private ArrayList<FeatureItem> mFeatureItem;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -66,23 +55,28 @@ public class PortalView extends AppCompatActivity{
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
-        mapView = (MapView)findViewById(R.id.map_view);
+        /*mapView = (MapView)findViewById(R.id.map_view);
         map = new Map(Basemap.createLightGrayCanvas());
         mapView.setMap(map);
         Point point = new Point(-9217274.228, 4257236.677, SpatialReference.create(102100));
-        mapView.setViewpointCenterAsync(point);
+        mapView.setViewpointCenterAsync(point);*/
         Intent portalViewIntent = getIntent();
         USERNAME= portalViewIntent.getStringExtra("username");
         PASSWORD = portalViewIntent.getStringExtra("password");
-
-
         new PortalViewAsyncTask().execute();
 
-
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        RecyclerFragment recyclerFragment = new RecyclerFragment();
+        //fragmentTransaction.add(R.id.map_view, recyclerFragment).commit();
 
     }
 
-    public class PortalViewAsyncTask extends AsyncTask<Void, Void, Void>{
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+
+    public class PortalViewAsyncTask extends AsyncTask<Void, Void, Void> {
     private Exception mException;
         private Portal portal;
         private PortalInfo portalInfo;
@@ -127,9 +121,7 @@ public class PortalView extends AppCompatActivity{
                                 if (data != null) {
                                     Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                                     mFeatureItem.add(new FeatureItem(portalItem, bitmap));
-
                                 }
-
                             }
                             runOnUiThread(new Runnable() {
                                 @Override

@@ -1,7 +1,6 @@
 package test.support.esri.com.portalitemview;
 
-import android.content.Context;
-import android.graphics.BitmapFactory;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,17 +10,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.esri.arcgisruntime.layers.ArcGISVectorTiledLayer;
 import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.mapping.Map;
-import com.esri.arcgisruntime.mapping.Viewpoint;
 import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.portal.PortalItemType;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
 
 /**
  * Created by kwas7493 on 4/1/2016.
@@ -37,8 +31,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.text_view, parent, false);
-        View underViewer = LayoutInflater.from(parent.getContext()).inflate(R.layout.portalview, parent, false);
-        mapView = (MapView)underViewer.findViewById(R.id.map_view);
+        View underViewer = LayoutInflater.from(parent.getContext()).inflate(R.layout.content_navigator, parent, false);
+        mapView = (MapView)underViewer.findViewById(R.id.nav_map_view);
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
     }
@@ -46,33 +40,36 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
 
-        TextView holderTextView = (TextView) holder.viewTextView;
-        final ImageView holderImageView = holder.imageView;
-        holderTextView.setText(portalDataset.get(position).getPortalItemName());
-        holderImageView.setImageBitmap(portalDataset.get(position).getmBitmap());
+        TextView holderNameView = (TextView) holder.viewTextView;
+        TextView holderDescView = (TextView)holder.viewDescView;
 
+        final ImageView holderImageView = holder.imageView;
+        holderNameView.setText(portalDataset.get(position).getPortalItemName());
+        holderImageView.setImageBitmap(portalDataset.get(position).getmBitmap());
+        holderDescView.setText(portalDataset.get(position).getPortalItem().getDescription());
         holderImageView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Toast.makeText(v.getContext(), "Map:  "+portalDataset.get(position).getPortalItemName(),
+            public void onClick(final View v) {
+                Toast.makeText(v.getContext(), "Item name is  "+portalDataset.get(position).getPortalItemName(),
                         Toast.LENGTH_SHORT).show();
                 if(portalDataset.get(position).getPortalItem().getType() == PortalItemType.WEBMAP) {
                     final Map portalMap = new Map(portalDataset.get(position).getPortalItem());
+                    portalMap.addDoneLoadingListener(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(v.getContext(), "Loaded", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                     portalMap.loadAsync();
-                   new Thread(new Runnable(){
-                       @Override
-                       public void run(){
+                    if(portalMap.getLoadStatus() == LoadStatus.LOADED){
+                        mapView.setMap(portalMap);
+                        mapView.setViewpointAsync(portalMap.getInitialViewpoint());
+                        v.getContext().startActivity(new Intent(v.getContext(), Navigator.class));
 
-                           if(portalMap.getLoadStatus() == LoadStatus.LOADED){
-                               mapView.setMap(portalMap);
-                               mapView.setViewpointAsync(portalMap.getInitialViewpoint());
-                           }else {
-                               Log.d("KwasiD", portalMap.getLoadStatus().toString());
-                           }
-                       }
+                    }else {
+                        Log.d("KwasiD", portalMap.getLoadStatus().toString());
 
-                   }).start();
-
+                    }
                 }
             }
         });
@@ -86,11 +83,15 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         View viewTextView;
+        View viewDescView;
         ImageView imageView;
+        MapView map_view;
         public ViewHolder(View view){
             super(view);
             this.viewTextView = view.findViewById(R.id.view_text);
             this.imageView = (ImageView)view.findViewById(R.id.thumbnail);
+            this.viewDescView = view.findViewById(R.id.map_desc);
+            this.map_view = (MapView) view.findViewById(R.id.nav_map_view);
         }
     }
 }

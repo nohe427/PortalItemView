@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/portal_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
@@ -18,27 +19,26 @@
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
         android:popupTheme="@style/ThemeOverlay.AppCompat.Light"></android.support.v7.widget.Toolbar>
-    <RelativeLayout
+ <!--   <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="418dp">
 
-        <com.esri.arcgisruntime.mapping.view.MapView
+        &lt;!&ndash;<com.esri.arcgisruntime.mapping.view.MapView
             android:id="@+id/map_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignParentTop="true" />
+            android:layout_alignParentTop="true" />&ndash;&gt;
 
-    </RelativeLayout>
+
+    </RelativeLayout>-->
+
     <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:layout_alignParentBottom="true"
-        android:outlineProvider="paddedBounds"
-        android:padding="@dimen/abc_control_inset_material">
+        android:layout_height="fill_parent">
 
     </android.support.v7.widget.RecyclerView>
 
