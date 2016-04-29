@@ -1,12 +1,17 @@
 package test.support.esri.com.portalitemview;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -50,18 +55,22 @@ private MapView navMapView;
     private RecyclerView recyclerView;
     private LinearLayoutManager mLinearLayout;
     private ArrayList<FeatureItem> mFeatureItem;
+    private static final int RETURN_USER_RESPONSE=0;
 
+    @TargetApi(Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigator);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        navMapView = (MapView)findViewById(R.id.nav_map_view);
+        nap_map = new Map(Basemap.createStreets());
+        navMapView.setMap(nap_map);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -81,12 +90,15 @@ private MapView navMapView;
         }
         }
         navigationView.setNavigationItemSelectedListener(this);
-        navMapView = (MapView)findViewById(R.id.nav_map_view);
-        nap_map = new Map(Basemap.createStreets());
-        navMapView.setMap(nap_map);
+
+        if(ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED){
         LocationDisplay locationDisplay = navMapView.getLocationDisplay();
         locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.NAVIGATION);
         locationDisplay.startAsync();
+        }else{
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, RETURN_USER_RESPONSE);
+        }
     }
 
     @Override
@@ -157,7 +169,6 @@ private MapView navMapView;
                         }
                     }
                 });
-
                 portal.loadAsync();
             }
 
