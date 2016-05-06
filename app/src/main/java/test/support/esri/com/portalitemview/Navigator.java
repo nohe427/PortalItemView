@@ -11,11 +11,12 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -43,7 +44,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 
-public class Navigator extends AppCompatActivity
+public class Navigator extends FragmentActivity
         implements NavigationView.OnNavigationItemSelectedListener, RecyclerFragment.OnFragmentInteractionListener{
 private MapView navMapView;
     private Map nap_map;
@@ -63,9 +64,9 @@ private MapView navMapView;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigator);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        //setSupportActionBar(toolbar);
         navMapView = (MapView)findViewById(R.id.nav_map_view);
-        nap_map = new Map(Basemap.createStreets());
+        nap_map = new Map(Basemap.createImageryWithLabels());
         navMapView.setMap(nap_map);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -154,8 +155,16 @@ private MapView navMapView;
         if (id==R.id.nav_login) {
             // Handle the log in action
             if(item.getTitle().toString().equalsIgnoreCase("Log in to Portal")){
-                Intent logInIntent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(logInIntent);
+
+                if(findViewById(R.id.nav_map_view) != null){
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                RecyclerFragment recyclerFragment = new RecyclerFragment();
+                fragmentManager.beginTransaction().add(R.id.nav_map_view, recyclerFragment).commit();
+                }
+
+
+                /*Intent logInIntent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(logInIntent);*/
             }
 
             //implement logic to log out of portal

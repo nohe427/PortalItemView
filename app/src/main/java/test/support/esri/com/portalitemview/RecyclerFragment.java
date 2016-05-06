@@ -2,6 +2,7 @@ package test.support.esri.com.portalitemview;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -14,8 +15,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
@@ -52,7 +53,19 @@ public class RecyclerFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
+    Button resetButton;
+    Button loginButton;
+    EditText txtUsername;
+    EditText txtPassword;
+    String username;
+    String password;
+    Intent i;
+    private View mainView;
+    private View viewRecycler;
+    private ArrayList<FeatureItem> mFeatureItem;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView recyclerView;
+    private LinearLayoutManager mLinearLayout;
     private OnFragmentInteractionListener mListener;
 
     public RecyclerFragment() {
@@ -84,13 +97,64 @@ public class RecyclerFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+
+    }
+
+    /**
+     * method to enable logging in to portal
+     */
+
+    private void loginToPortal() {
+        //check for empty content
+
+        if(txtUsername.getText().toString().length() == 0 && txtPassword.getText().toString().length() == 0){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mainView.getContext(), "Please provide a password and username.", Toast.LENGTH_LONG).show();
+                }
+            });
+            return;
+        }
+
+        username = txtUsername.getText().toString().trim();
+        password = txtPassword.getText().toString().trim();
+
+        //bad way but this ensure the navigation view contains the right information
+        i = new Intent(mainView.getContext(), Navigator.class);
+        i.putExtra("username", username);
+        i.putExtra("password", password);
+        startActivity(i);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        //inflate the view for the creation of the recycler view
+        viewRecycler = inflater.inflate(R.layout.content_portal_view, container, false);
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_recycler, container, false);
+      mainView = inflater.inflate(R.layout.fragment_recycler, container, false);
+        resetButton = (Button)mainView.findViewById(R.id.resetbutton);
+        loginButton = (Button)mainView.findViewById(R.id.loginbutton);
+        txtUsername = (EditText)mainView.findViewById(R.id.portalusername);
+        txtPassword = (EditText)mainView.findViewById(R.id.portalpassword);
+        resetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                txtUsername.setText("");
+                txtPassword.setText("");
+            }
+        });
+
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loginToPortal();
+                new PortalViewAsyncTask().execute();
+            }
+        });
+        return  mainView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -130,6 +194,85 @@ public class RecyclerFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    public class PortalViewAsyncTask extends AsyncTask<Void, Void, Void> {
+        private Exception mException;
+        private Portal portal;
+        private PortalInfo portalInfo;
+        public PortalViewAsyncTask(){
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            mException= null;
+            portal = new Portal("http://www.arcgis.com", new UserCredential(username, password));
+            portal.addDoneLoadingListener(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (portal.getLoadStatus() == LoadStatus.LOADED) {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(mainView.getContext(), "Portal loaded for: " + portal.getPortalUser().getFullName(),
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            });
+                            portalInfo = portal.getPortalInfo();
+                            //initialize ArrayList
+                            mFeatureItem = new ArrayList<>();
+                            //return if cancelled
+                            if (isCancelled()) {
+                                return;
+                            }
+
+                            //provide your queries
+                            ListenableFuture<PortalQueryResultSet<PortalItem>> portalListItems =
+                                    portal.findItemsAsync(new PortalQueryParams("owner: "+username));
+                            List<PortalItem> portalItems = portalListItems.get().getResults();
+                            for (PortalItem portalItem : portalItems) {
+                                byte[] data = portalItem.fetchThumbnailAsync().get();
+                                if (isCancelled()) {
+                                    return;
+                                }
+
+                                if (data != null) {
+                                    Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                    mFeatureItem.add(new FeatureItem(portalItem, bitmap));
+                                }
+                            }
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mAdapter = new MyAdapter(mFeatureItem);
+                                    recyclerView = (RecyclerView)viewRecycler.findViewById(R.id.recycler_view);
+                                    mLinearLayout = new LinearLayoutManager(viewRecycler.getContext());
+                                    recyclerView.setLayoutManager(mLinearLayout);
+                                    recyclerView.setAdapter(mAdapter);
+
+                                }
+                            });
+                        }
+                    } catch (ExecutionException | InterruptedException exception) {
+                        Log.d("Exception", exception.getMessage());
+                    }
+                }
+            });
+            portal.loadAsync();
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute(){
+
+        }
+
+        @Override
+        protected void onPostExecute(Void result){
+
+        }
     }
 
 }
