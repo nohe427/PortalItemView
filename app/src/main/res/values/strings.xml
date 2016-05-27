@@ -8,7 +8,7 @@
     <string name="title_activity_portal_view2">PortalView2</string>
     <string name="title_activity_portal_view">PortalView</string>
     <string name="logout">Log out</string>
-    <string name="copyright">(c) 2016 esri support Quartz beta test</string>
+    <string name="copyright">(c) 2016 esri support quartz beta test</string>
     <string name="title_activity_navigator">Navigator</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -19,4 +19,13 @@
     <string name="anonymous">Anonymous user</string>
     <string name="login_icon">icon image</string>
     <string name="login_log">login log</string>
+    <string name="title_activity_tabbed_holder">TabbedHolderActivity</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <string name="title_activity_app_launcher">AppLauncherActivity</string>
+    <string name="sign_in_button">Sign in</string>
+    <string name="app_content">Sign in to arcgis online or your portal\n
+    </string>
+    <string name="image_description">launcher_logo</string>
+    <string name="esri">esri</string>
 </resources>

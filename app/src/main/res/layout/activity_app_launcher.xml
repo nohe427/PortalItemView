@@ -1,0 +1,68 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fullscreen_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/wallet_bright_foreground_disabled_holo_light"
+    tools:context="test.support.esri.com.portalitemview.AppLauncherActivity">
+
+    <!-- The primary full-screen view. This can be replaced with whatever view
+         is needed to present your content, e.g. VideoView, SurfaceView,
+         TextureView, etc. -->
+    <TextView
+        android:id="@+id/fullscreen_content"
+        android:layout_width="match_parent"
+        android:layout_height="436dp"
+        android:gravity="center_vertical|bottom|center"
+        android:keepScreenOn="true"
+        android:text="@string/app_content"
+        android:textColor="@color/abc_primary_text_material_dark"
+        android:textSize="20sp"
+        android:textStyle="normal" />
+
+    <!-- This FrameLayout insets its children based on system windows using
+         android:fitsSystemWindows. -->
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:layout_gravity="bottom|center_horizontal">
+
+        <LinearLayout
+            android:id="@+id/fullscreen_content_controls"
+            style="?metaButtonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:background="@color/black_overlay"
+            android:orientation="horizontal"
+            tools:ignore="UselessParent">
+
+            <Button
+            android:id="@+id/sign_button"
+            style="?metaButtonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/sign_in_button"
+            android:textColor="@color/abc_primary_text_disable_only_material_dark"
+            android:textSize="15sp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/app_name"
+            android:layout_gravity="center"
+            android:textStyle="normal|bold"
+            android:text="@string/app_name"
+            android:textColor="@color/abc_primary_text_material_dark"
+            android:textSize="30sp" />
+
+
+    </FrameLayout>
+
+</FrameLayout>

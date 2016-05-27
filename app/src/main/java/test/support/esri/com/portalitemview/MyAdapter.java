@@ -1,8 +1,6 @@
 package test.support.esri.com.portalitemview;
 
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,14 +21,14 @@ import java.util.ArrayList;
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
     ArrayList<FeatureItem> portalDataset;
     MapView mapView;
+    View view;
     public MyAdapter(ArrayList<FeatureItem> mPortalDataset){
         portalDataset = mPortalDataset;
-
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.text_view, parent, false);
+         view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view, parent, false);
         View underViewer = LayoutInflater.from(parent.getContext()).inflate(R.layout.content_navigator, parent, false);
         mapView = (MapView)underViewer.findViewById(R.id.nav_map_view);
         ViewHolder viewHolder = new ViewHolder(view);
@@ -40,7 +38,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
 
-        TextView holderNameView = (TextView) holder.viewTextView;
+        TextView holderNameView = (TextView)holder.viewTextView;
         TextView holderDescView = (TextView)holder.viewDescView;
 
         final ImageView holderImageView = holder.imageView;
@@ -54,22 +52,25 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
                         Toast.LENGTH_SHORT).show();
                 if(portalDataset.get(position).getPortalItem().getType() == PortalItemType.WEBMAP) {
                     final Map portalMap = new Map(portalDataset.get(position).getPortalItem());
+                    portalMap.loadAsync();
                     portalMap.addDoneLoadingListener(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(v.getContext(), "Loaded", Toast.LENGTH_SHORT).show();
+                            if(portalMap.getLoadStatus() == LoadStatus.LOADED){
+                                mapView.setMap(portalMap);
+                                Toast.makeText(v.getContext(), "Loaded", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     });
-                    portalMap.loadAsync();
-                    if(portalMap.getLoadStatus() == LoadStatus.LOADED){
+
+                   /* if(portalMap.getLoadStatus() == LoadStatus.LOADED){
                         mapView.setMap(portalMap);
                         mapView.setViewpointAsync(portalMap.getInitialViewpoint());
                         v.getContext().startActivity(new Intent(v.getContext(), Navigator.class));
-
                     }else {
                         Log.d("KwasiD", portalMap.getLoadStatus().toString());
 
-                    }
+                    }*/
                 }
             }
         });
@@ -81,7 +82,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
         return portalDataset.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         View viewTextView;
         View viewDescView;
         ImageView imageView;

@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
          username = txtUsername.getText().toString().trim();
          password = txtPassword.getText().toString().trim();
-        i = new Intent(getApplicationContext(), Navigator.class);
+        i = new Intent(getApplicationContext(), PortalView.class);
         i.putExtra("username", username);
         i.putExtra("password", password);
         startActivity(i);

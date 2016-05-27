@@ -15,8 +15,8 @@
 
     <ImageView
         android:id="@+id/screen_image"
-        android:layout_width="126dp"
-        android:layout_height="80dp"
+        android:layout_width="180dp"
+        android:layout_height="100dp"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:src="@mipmap/nopic"
         android:layout_weight="0.34" />

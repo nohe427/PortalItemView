@@ -3,34 +3,15 @@ package test.support.esri.com.portalitemview;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.esri.arcgisruntime.concurrent.ListenableFuture;
-import com.esri.arcgisruntime.loadable.LoadStatus;
-import com.esri.arcgisruntime.portal.Portal;
-import com.esri.arcgisruntime.portal.PortalInfo;
-import com.esri.arcgisruntime.portal.PortalItem;
-import com.esri.arcgisruntime.portal.PortalQueryParams;
-import com.esri.arcgisruntime.portal.PortalQueryResultSet;
-import com.esri.arcgisruntime.security.UserCredential;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -44,29 +25,21 @@ import java.util.concurrent.ExecutionException;
 public class RecyclerFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
+    private static final String USERNAME = "username";
+    private static final String PASSWORD = "password";
+    private OnFragmentInteractionListener mListener;
 
     private Activity containingActivity;
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private String username;
+    private String password;
     Button resetButton;
     Button loginButton;
-    EditText txtUsername;
-    EditText txtPassword;
-    String username;
-    String password;
-    Intent i;
+    static EditText txtUsername;
+    static EditText txtPassword;
     private View mainView;
-    private View viewRecycler;
-    private ArrayList<FeatureItem> mFeatureItem;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView recyclerView;
-    private LinearLayoutManager mLinearLayout;
-    private OnFragmentInteractionListener mListener;
+
 
     public RecyclerFragment() {
         // Required empty public constructor
@@ -84,8 +57,8 @@ public class RecyclerFragment extends Fragment {
     public static RecyclerFragment newInstance(String param1, String param2) {
         RecyclerFragment fragment = new RecyclerFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(USERNAME, txtUsername.getText().toString());
+        args.putString(PASSWORD, txtPassword.getText().toString());
         fragment.setArguments(args);
         return fragment;
     }
@@ -94,8 +67,8 @@ public class RecyclerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            username = getArguments().getString(USERNAME);
+            password = getArguments().getString(PASSWORD);
         }
 
 
@@ -120,25 +93,29 @@ public class RecyclerFragment extends Fragment {
 
         username = txtUsername.getText().toString().trim();
         password = txtPassword.getText().toString().trim();
+        Bundle argBundle = new Bundle();
+        argBundle.putString("USERNAME", username);
+        argBundle.putString("PASSWORD", password);
+        PortalViewFragment portalViewFragment = new PortalViewFragment();
+        portalViewFragment.setArguments(argBundle);
 
-        //bad way but this ensure the navigation view contains the right information
-        i = new Intent(mainView.getContext(), Navigator.class);
-        i.putExtra("username", username);
-        i.putExtra("password", password);
-        startActivity(i);
+        startActivity(new Intent(getContext(), TabbedHolderActivity.class));
+      /*  FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fullscreen_layout, portalViewFragment);
+        fragmentTransaction.addToBackStack("LOG_IN_FRAGMENT");
+                fragmentTransaction.commit();*/
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        //inflate the view for the creation of the recycler view
-        viewRecycler = inflater.inflate(R.layout.content_portal_view, container, false);
+
         // Inflate the layout for this fragment
-      mainView = inflater.inflate(R.layout.fragment_recycler, container, false);
+      mainView = inflater.inflate(R.layout.log_in_fragment, container, false);
         resetButton = (Button)mainView.findViewById(R.id.resetbutton);
         loginButton = (Button)mainView.findViewById(R.id.loginbutton);
-        txtUsername = (EditText)mainView.findViewById(R.id.portalusername);
-        txtPassword = (EditText)mainView.findViewById(R.id.portalpassword);
+        txtUsername = (EditText)mainView.findViewById(R.id.portal_username);
+        txtPassword = (EditText)mainView.findViewById(R.id.portal_password);
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -151,7 +128,6 @@ public class RecyclerFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 loginToPortal();
-                new PortalViewAsyncTask().execute();
             }
         });
         return  mainView;
@@ -169,6 +145,7 @@ public class RecyclerFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
+
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -196,83 +173,5 @@ public class RecyclerFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    public class PortalViewAsyncTask extends AsyncTask<Void, Void, Void> {
-        private Exception mException;
-        private Portal portal;
-        private PortalInfo portalInfo;
-        public PortalViewAsyncTask(){
-
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            mException= null;
-            portal = new Portal("http://www.arcgis.com", new UserCredential(username, password));
-            portal.addDoneLoadingListener(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        if (portal.getLoadStatus() == LoadStatus.LOADED) {
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(mainView.getContext(), "Portal loaded for: " + portal.getPortalUser().getFullName(),
-                                            Toast.LENGTH_LONG).show();
-                                }
-                            });
-                            portalInfo = portal.getPortalInfo();
-                            //initialize ArrayList
-                            mFeatureItem = new ArrayList<>();
-                            //return if cancelled
-                            if (isCancelled()) {
-                                return;
-                            }
-
-                            //provide your queries
-                            ListenableFuture<PortalQueryResultSet<PortalItem>> portalListItems =
-                                    portal.findItemsAsync(new PortalQueryParams("owner: "+username));
-                            List<PortalItem> portalItems = portalListItems.get().getResults();
-                            for (PortalItem portalItem : portalItems) {
-                                byte[] data = portalItem.fetchThumbnailAsync().get();
-                                if (isCancelled()) {
-                                    return;
-                                }
-
-                                if (data != null) {
-                                    Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                    mFeatureItem.add(new FeatureItem(portalItem, bitmap));
-                                }
-                            }
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mAdapter = new MyAdapter(mFeatureItem);
-                                    recyclerView = (RecyclerView)viewRecycler.findViewById(R.id.recycler_view);
-                                    mLinearLayout = new LinearLayoutManager(viewRecycler.getContext());
-                                    recyclerView.setLayoutManager(mLinearLayout);
-                                    recyclerView.setAdapter(mAdapter);
-
-                                }
-                            });
-                        }
-                    } catch (ExecutionException | InterruptedException exception) {
-                        Log.d("Exception", exception.getMessage());
-                    }
-                }
-            });
-            portal.loadAsync();
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute(){
-
-        }
-
-        @Override
-        protected void onPostExecute(Void result){
-
-        }
-    }
 
 }

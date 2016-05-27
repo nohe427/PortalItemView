@@ -3,10 +3,8 @@ package test.support.esri.com.portalitemview;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,9 +29,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Created by kwas7493 on 4/1/2016.
+ * Created by kwas7493 on 4/1/2016. AppCompatActivity implements RecyclerFragment.OnFragmentInteractionListener
  */
-public class PortalView extends AppCompatActivity implements RecyclerFragment.OnFragmentInteractionListener{
+public class PortalView extends AppCompatActivity{
     private MapView mapView;
     private Map map;
     private ImageButton portalimagebutton;
@@ -53,30 +51,33 @@ public class PortalView extends AppCompatActivity implements RecyclerFragment.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.portalview);
 
+
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
-        /*mapView = (MapView)findViewById(R.id.map_view);
+        /*mapView = (MapView)findViewById(R.id.nav_map_view);
         map = new Map(Basemap.createLightGrayCanvas());
         mapView.setMap(map);
         Point point = new Point(-9217274.228, 4257236.677, SpatialReference.create(102100));
-        mapView.setViewpointCenterAsync(point);*/
+        mapView.setViewpointCenterAsync(point);/*//**/
+
         Intent portalViewIntent = getIntent();
         USERNAME= portalViewIntent.getStringExtra("username");
         PASSWORD = portalViewIntent.getStringExtra("password");
         new PortalViewAsyncTask().execute();
 
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        RecyclerFragment recyclerFragment = new RecyclerFragment();
+        /*FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        RecyclerFragment recyclerFragment = new RecyclerFragment();*/
         //fragmentTransaction.add(R.id.map_view, recyclerFragment).commit();
 
+
     }
 
-    @Override
+    /*@Override
     public void onFragmentInteraction(Uri uri) {
 
-    }
+    }*/
 
-    public class PortalViewAsyncTask extends AsyncTask<Void, Void, Void> {
+   public class PortalViewAsyncTask extends AsyncTask<Void, Void, Void> {
     private Exception mException;
         private Portal portal;
         private PortalInfo portalInfo;
@@ -127,11 +128,10 @@ public class PortalView extends AppCompatActivity implements RecyclerFragment.On
                                 @Override
                                 public void run() {
                                     mAdapter = new MyAdapter(mFeatureItem);
-                                    recyclerView = (RecyclerView)findViewById(R.id.recycler_view);
+                                    recyclerView = (RecyclerView)findViewById(R.id.card_view);
                                     mLinearLayout = new LinearLayoutManager(getApplicationContext());
                                     recyclerView.setLayoutManager(mLinearLayout);
                                     recyclerView.setAdapter(mAdapter);
-
                                 }
                             });
                         }

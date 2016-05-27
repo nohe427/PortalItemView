@@ -1,0 +1,94 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_layout"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:textAlignment="gravity"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+    android:background="@android:color/darker_gray"
+    android:columnOrderPreserved="false"
+    android:columnCount="@integer/num_of_cols"
+    android:rowCount="@integer/num_rows"
+    android:orientation="vertical">
+
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/input_layout_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="200dp"
+        android:textAlignment="center">
+
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/portal_username"
+            android:hint="@string/username"
+            android:layout_above="@+id/portal_password"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:layout_row="0"
+            android:layout_column="0"
+            android:textColorHint="@color/abc_input_method_navigation_guard"
+            android:textAlignment="center"
+            android:textColor="@color/abc_input_method_navigation_guard" />
+
+
+    </android.support.design.widget.TextInputLayout>
+
+<android.support.design.widget.TextInputLayout
+    android:id="@+id/input_layout_password"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textAlignment="center">
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/portal_password"
+        android:hint="@string/password"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:textColor="@color/abc_input_method_navigation_guard"
+        android:textColorHint="@color/abc_input_method_navigation_guard"
+        android:textAlignment="center"/>
+</android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/login"
+        android:id="@+id/loginbutton"
+        android:layout_alignTop="@+id/resetbutton"
+        android:layout_alignEnd="@+id/portalpassword"
+        android:layout_row="12"
+        android:layout_column="1"
+        android:alpha="0.2" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/reset"
+        android:id="@+id/resetbutton"
+        android:layout_above="@+id/copyright"
+        android:layout_alignStart="@+id/portalpassword"
+        android:alpha="0.2" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/copyright"
+        android:id="@+id/copyright"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/resetbutton"
+        android:layout_alignEnd="@+id/loginbutton"
+        android:textAlignment="center"
+        android:layout_marginTop="90dp"
+        android:textColor="@color/abc_primary_text_material_light" />
+
+</LinearLayout>

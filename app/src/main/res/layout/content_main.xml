@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
 
     tools:context="test.support.esri.com.portalitemview.MainActivity"
-    tools:showIn="@layout/activity_main">
+    tools:showIn="@layout/activity_main"
+    android:background="@android:color/darker_gray">
 
 
     <ImageView
