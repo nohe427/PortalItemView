@@ -96,9 +96,11 @@ public class LogInFragment extends Fragment {
         Bundle argBundle = new Bundle();
         argBundle.putString("USERNAME", username);
         argBundle.putString("PASSWORD", password);
+        argBundle.putString("FRAGMENTTAG", "portal_view_fragment");
         Intent navigatorIntent = new Intent(getContext(), Navigator.class);
         navigatorIntent.putExtra("USERNAME", username);
         navigatorIntent.putExtra("PASSWORD", password);
+
         PortalViewFragment portalViewFragment = new PortalViewFragment();
         portalViewFragment.setArguments(argBundle);
         getActivity().startActivityFromFragment(this, navigatorIntent, 1);

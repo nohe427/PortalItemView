@@ -21,8 +21,10 @@ import android.widget.TextView;
 
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
 import com.esri.arcgisruntime.loadable.LoadStatus;
+import com.esri.arcgisruntime.mapping.Map;
 import com.esri.arcgisruntime.portal.Portal;
 import com.esri.arcgisruntime.portal.PortalItem;
+import com.esri.arcgisruntime.portal.PortalItemType;
 import com.esri.arcgisruntime.portal.PortalQueryParams;
 import com.esri.arcgisruntime.portal.PortalQueryResultSet;
 import com.esri.arcgisruntime.security.UserCredential;
@@ -200,21 +202,24 @@ public class PortalViewFragment extends Fragment {
 
                                 if (data != null) {
                                     Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                    mFeatureItem.add(new FeatureItem(portalItem, bitmap));
+                                    if(portalItem.getType() == PortalItemType.WEBMAP)
+                                    mFeatureItem.add(new FeatureItem(portalItem, bitmap, new Map(portalItem)));
 
                                 }
                             }
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    mAdapter = new MyAdapter(mFeatureItem);
-
+                                    mAdapter = new MyAdapter(mFeatureItem, getActivity().getSupportFragmentManager());
                                     recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
                                     mLinearLayout = new LinearLayoutManager(getActivity());
                                     recyclerView.setLayoutManager(mLinearLayout);
                                     recyclerView.setAdapter(mAdapter);
+
                                 }
                             });
+
+
 
                         }else{
                             if(portal.getLoadStatus() == LoadStatus.FAILED_TO_LOAD){

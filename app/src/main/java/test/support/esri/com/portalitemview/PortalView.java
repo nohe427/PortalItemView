@@ -121,13 +121,13 @@ public class PortalView extends AppCompatActivity{
 
                                 if (data != null) {
                                     Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                    mFeatureItem.add(new FeatureItem(portalItem, bitmap));
+                                    mFeatureItem.add(new FeatureItem(portalItem, bitmap, new Map()));
                                 }
                             }
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    mAdapter = new MyAdapter(mFeatureItem);
+                                    mAdapter = new MyAdapter(mFeatureItem, getSupportFragmentManager());
                                     recyclerView = (RecyclerView)findViewById(R.id.card_view);
                                     mLinearLayout = new LinearLayoutManager(getApplicationContext());
                                     recyclerView.setLayoutManager(mLinearLayout);

@@ -1,6 +1,9 @@
 package test.support.esri.com.portalitemview;
 
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +25,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
     ArrayList<FeatureItem> portalDataset;
     MapView mapView;
     View view;
-    public MyAdapter(ArrayList<FeatureItem> mPortalDataset){
+    FragmentManager fragmentManager;
+    public MyAdapter(ArrayList<FeatureItem> mPortalDataset, FragmentManager appFragmentManager){
         portalDataset = mPortalDataset;
+        fragmentManager = appFragmentManager;
     }
 
     @Override
@@ -55,9 +60,17 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
                         @Override
                         public void run() {
                             if(portalMap.getLoadStatus() == LoadStatus.LOADED){
-
-                                mapView.setMap(portalMap);
+                                fragmentManager.beginTransaction().remove(fragmentManager.findFragmentByTag("recycler_view_fragment"))
+                                        .commit();
+                                MapView realMapView = (MapView) fragmentManager.findFragmentByTag("recycler_view_fragment").getActivity()
+                                        .findViewById(R.id.nav_map_view);
+                                realMapView.setMap(portalMap);
+                                Log.d("Kwasi", portalMap.getOperationalLayers().get(0).getName());
                                 Toast.makeText(v.getContext(), "Loaded", Toast.LENGTH_SHORT).show();
+                            }else if(portalMap.getLoadStatus() == LoadStatus.FAILED_TO_LOAD){
+                                Snackbar.make(v, "Yo man the map did not load \n" +
+                                        "because; "+portalMap.getLoadError().getMessage(),
+                                        Snackbar.LENGTH_LONG).show();
                             }
                         }
                     });

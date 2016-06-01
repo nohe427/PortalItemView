@@ -58,7 +58,7 @@ private MapView navMapView;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         navMapView = (MapView)findViewById(R.id.nav_map_view);
-        nap_map = new Map(Basemap.createImageryWithLabels());
+        nap_map = new Map(Basemap.createLightGrayCanvas());
         navMapView.setMap(nap_map);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -75,7 +75,7 @@ private MapView navMapView;
                navigationView.getMenu().getItem(i).setEnabled(false);
             }
            if(menuTitle.equalsIgnoreCase("ArcGIS Community")){
-               portal = new Portal("http://www.arcgis.com");//"http://www.arcgis.com", new UserCredential(USERNAME, PASSWORD));
+               portal = new Portal("https://www.arcgis.com");//"http://www.arcgis.com", new UserCredential(USERNAME, PASSWORD));
                if(portal.getLoadStatus() != LoadStatus.LOADED){
                for(int c=0; c < navigationView.getMenu().getItem(i).getSubMenu().size(); c++) {
                        navigationView.getMenu().getItem(i).getSubMenu().getItem(c).setEnabled(false);
@@ -100,7 +100,7 @@ private MapView navMapView;
         argBundle.putString("USERNAME",getIntent().getStringExtra("USERNAME"));
         argBundle.putString("PASSWORD", getIntent().getStringExtra("PASSWORD"));
         portalViewFragment.setArguments(argBundle);
-        fragmentTransaction.add(R.id.nav_map_view, portalViewFragment).commit();
+        fragmentTransaction.add(R.id.nav_map_view, portalViewFragment, "recycler_view_fragment").commit();
     }
 
     @Override

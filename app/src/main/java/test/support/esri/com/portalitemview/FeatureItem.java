@@ -2,6 +2,7 @@ package test.support.esri.com.portalitemview;
 
 import android.graphics.Bitmap;
 
+import com.esri.arcgisruntime.mapping.Map;
 import com.esri.arcgisruntime.portal.PortalItem;
 
 /**
@@ -10,10 +11,12 @@ import com.esri.arcgisruntime.portal.PortalItem;
 public class FeatureItem {
     PortalItem mPortalItem;
     Bitmap mBitmap;
+    Map map;
 
-    public FeatureItem(PortalItem portalItem, Bitmap bitmap){
+    public FeatureItem(PortalItem portalItem, Bitmap bitmap, Map portalMap){
         this.mBitmap = bitmap;
         this.mPortalItem = portalItem;
+        this.map = portalMap;
     }
 
     public String getPortalItemName(){
@@ -33,6 +36,11 @@ public class FeatureItem {
     public Bitmap getmBitmap(){
         assert mBitmap != null;
         return mBitmap;
+    }
+
+    public Map getPortalMap(){
+        assert map !=null;
+              return map;
     }
 
     public PortalItem getPortalItem(){
