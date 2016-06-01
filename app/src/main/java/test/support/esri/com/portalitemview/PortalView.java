@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Created by kwas7493 on 4/1/2016. AppCompatActivity implements RecyclerFragment.OnFragmentInteractionListener
+ * Created by kwas7493 on 4/1/2016. AppCompatActivity implements LogInFragment.OnFragmentInteractionListener
  */
 public class PortalView extends AppCompatActivity{
     private MapView mapView;
@@ -66,7 +66,7 @@ public class PortalView extends AppCompatActivity{
         new PortalViewAsyncTask().execute();
 
         /*FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        RecyclerFragment recyclerFragment = new RecyclerFragment();*/
+        LogInFragment recyclerFragment = new LogInFragment();*/
         //fragmentTransaction.add(R.id.map_view, recyclerFragment).commit();
 
 

@@ -42,14 +42,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
         TextView holderDescView = (TextView)holder.viewDescView;
 
         final ImageView holderImageView = holder.imageView;
-        holderNameView.setText(portalDataset.get(position).getPortalItemName());
+        holderNameView.setText(portalDataset.get(position).getPortalItemTitle());
         holderImageView.setImageBitmap(portalDataset.get(position).getmBitmap());
         holderDescView.setText(portalDataset.get(position).getPortalItem().getDescription());
         holderImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                Toast.makeText(v.getContext(), "Item name is  "+portalDataset.get(position).getPortalItemName(),
-                        Toast.LENGTH_SHORT).show();
                 if(portalDataset.get(position).getPortalItem().getType() == PortalItemType.WEBMAP) {
                     final Map portalMap = new Map(portalDataset.get(position).getPortalItem());
                     portalMap.loadAsync();
@@ -57,20 +55,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
                         @Override
                         public void run() {
                             if(portalMap.getLoadStatus() == LoadStatus.LOADED){
+
                                 mapView.setMap(portalMap);
                                 Toast.makeText(v.getContext(), "Loaded", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
 
-                   /* if(portalMap.getLoadStatus() == LoadStatus.LOADED){
-                        mapView.setMap(portalMap);
-                        mapView.setViewpointAsync(portalMap.getInitialViewpoint());
-                        v.getContext().startActivity(new Intent(v.getContext(), Navigator.class));
-                    }else {
-                        Log.d("KwasiD", portalMap.getLoadStatus().toString());
-
-                    }*/
                 }
             }
         });

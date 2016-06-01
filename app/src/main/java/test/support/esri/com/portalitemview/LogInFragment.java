@@ -17,12 +17,12 @@ import android.widget.Toast;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link RecyclerFragment.OnFragmentInteractionListener} interface
+ * {@link LogInFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link RecyclerFragment#newInstance} factory method to
+ * Use the {@link LogInFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RecyclerFragment extends Fragment {
+public class LogInFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String USERNAME = "username";
@@ -41,7 +41,7 @@ public class RecyclerFragment extends Fragment {
     private View mainView;
 
 
-    public RecyclerFragment() {
+    public LogInFragment() {
         // Required empty public constructor
     }
 
@@ -51,11 +51,11 @@ public class RecyclerFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment RecyclerFragment.
+     * @return A new instance of fragment LogInFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static RecyclerFragment newInstance(String param1, String param2) {
-        RecyclerFragment fragment = new RecyclerFragment();
+    public static LogInFragment newInstance(String param1, String param2) {
+        LogInFragment fragment = new LogInFragment();
         Bundle args = new Bundle();
         args.putString(USERNAME, txtUsername.getText().toString());
         args.putString(PASSWORD, txtPassword.getText().toString());
@@ -96,15 +96,13 @@ public class RecyclerFragment extends Fragment {
         Bundle argBundle = new Bundle();
         argBundle.putString("USERNAME", username);
         argBundle.putString("PASSWORD", password);
+        Intent navigatorIntent = new Intent(getContext(), Navigator.class);
+        navigatorIntent.putExtra("USERNAME", username);
+        navigatorIntent.putExtra("PASSWORD", password);
         PortalViewFragment portalViewFragment = new PortalViewFragment();
         portalViewFragment.setArguments(argBundle);
-
-        startActivity(new Intent(getContext(), TabbedHolderActivity.class));
-      /*  FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fullscreen_layout, portalViewFragment);
-        fragmentTransaction.addToBackStack("LOG_IN_FRAGMENT");
-                fragmentTransaction.commit();*/
-    }
+        getActivity().startActivityFromFragment(this, navigatorIntent, 1);
+}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

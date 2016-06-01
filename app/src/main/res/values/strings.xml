@@ -28,4 +28,5 @@
     </string>
     <string name="image_description">launcher_logo</string>
     <string name="esri">esri</string>
+    <string name="sign_in_to_arcgis_online_or_your_portal">Sign in to arcgis online or your portal</string>
 </resources>

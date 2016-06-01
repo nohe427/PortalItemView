@@ -33,7 +33,7 @@ import java.util.ArrayList;
 
 
 public class Navigator extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, RecyclerFragment.OnFragmentInteractionListener, PortalViewFragment.OnFragmentInteractionListener{
+        implements NavigationView.OnNavigationItemSelectedListener, LogInFragment.OnFragmentInteractionListener, PortalViewFragment.OnFragmentInteractionListener{
 private MapView navMapView;
     private Map nap_map;
     private NavigationView navigationView;
@@ -47,7 +47,7 @@ private MapView navMapView;
     private static final int RETURN_USER_RESPONSE=0;
     private FragmentTransaction fragmentTransaction;
     private FragmentManager fragmentManager;
-    private RecyclerFragment recyclerFragment;
+    private LogInFragment logInFragment;
     private  String menuTitle;
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -94,6 +94,13 @@ private MapView navMapView;
         }else{
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, RETURN_USER_RESPONSE);
         }
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        PortalViewFragment portalViewFragment = new PortalViewFragment();
+        Bundle argBundle = new Bundle();
+        argBundle.putString("USERNAME",getIntent().getStringExtra("USERNAME"));
+        argBundle.putString("PASSWORD", getIntent().getStringExtra("PASSWORD"));
+        portalViewFragment.setArguments(argBundle);
+        fragmentTransaction.add(R.id.nav_map_view, portalViewFragment).commit();
     }
 
     @Override
@@ -165,7 +172,7 @@ private MapView navMapView;
                 if(findViewById(R.id.nav_map_view) != null){
                     fragmentManager = getSupportFragmentManager();
                     fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.nav_map_view, new RecyclerFragment(), "LOG_IN_FRAGMENT");
+                    fragmentTransaction.replace(R.id.nav_map_view, new LogInFragment(), "LOG_IN_FRAGMENT");
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
 

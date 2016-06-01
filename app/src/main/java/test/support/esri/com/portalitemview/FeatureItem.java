@@ -21,6 +21,13 @@ public class FeatureItem {
         return mPortalItem.getName();
     }
 
+    public String getPortalItemTitle(){
+        assert  mPortalItem !=null;
+        return mPortalItem.getTitle();
+
+    }
+
+
 
 
     public Bitmap getmBitmap(){

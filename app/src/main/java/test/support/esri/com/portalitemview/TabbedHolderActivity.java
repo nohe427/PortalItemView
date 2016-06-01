@@ -123,7 +123,7 @@ public class TabbedHolderActivity extends AppCompatActivity {
 
             MapView mapView = new MapView(rootView.getContext());
             mapView.setMap(new Map(Basemap.createImagery()));
-            return rootView;
+            return mapView;
         }
     }
 

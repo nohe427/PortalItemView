@@ -1,20 +1,35 @@
 package test.support.esri.com.portalitemview;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.esri.arcgisruntime.concurrent.ListenableFuture;
+import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.portal.Portal;
+import com.esri.arcgisruntime.portal.PortalItem;
+import com.esri.arcgisruntime.portal.PortalQueryParams;
+import com.esri.arcgisruntime.portal.PortalQueryResultSet;
 import com.esri.arcgisruntime.security.UserCredential;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -117,16 +132,6 @@ public class PortalViewFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
@@ -144,7 +149,7 @@ public class PortalViewFragment extends Fragment {
             mException= null;
             portal = new Portal("http://www.arcgis.com", new UserCredential(username, password));
             portal.loadAsync();
-           /* portal.addDoneLoadingListener(new Runnable() {
+            portal.addDoneLoadingListener(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -153,8 +158,8 @@ public class PortalViewFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     try {
-                                        getActivity().startActivityFromFragment(getActivity().getSupportFragmentManager().findFragmentByTag("LoginFragment"), new Intent(getContext(), Navigator.class), 1);
-                                        Snackbar.make(getActivity().findViewById(R.id.fullscreen_layout), "Portal loaded for: "+
+                                       Log.d("KwasiD", getActivity().getLocalClassName());
+                                        Snackbar.make(getActivity().findViewById(R.id.nav_view), "Portal loaded for: "+
                                         portal.getPortalUser().getFullName(), Snackbar.LENGTH_LONG).show();
                                         TextView screen_name = (TextView) getActivity().findViewById(R.id.screen_name);
                                         screen_name.setText("Welcome " + portal.getPortalUser().getFullName());
@@ -162,7 +167,7 @@ public class PortalViewFragment extends Fragment {
                                         byte[] imgByte = portal.getPortalUser().fetchThumbnailAsync().get();
 
                                         if(imgByte == null){
-                                            Snackbar.make(getActivity().findViewById(R.id.fullscreen_layout), "No thumbnail set for user: "
+                                            Snackbar.make(getActivity().findViewById(R.id.nav_view), "No thumbnail set for user: "
                                             +portal.getPortalUser().getUserName(), Snackbar.LENGTH_LONG).show();
                                         }else {
                                             screenImage.setImageBitmap(BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length));
@@ -170,7 +175,6 @@ public class PortalViewFragment extends Fragment {
                                         NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
                                        MenuItem loginMenuItem = navigationView.getMenu().getItem(0);
                                         loginMenuItem.setTitle("Log Out");
-//                                        Log.d("KwasiD", getActivity().getLocalClassName());
                                     }catch (ExecutionException | InterruptedException ex){
 
                                     }
@@ -197,18 +201,21 @@ public class PortalViewFragment extends Fragment {
                                 if (data != null) {
                                     Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                                     mFeatureItem.add(new FeatureItem(portalItem, bitmap));
+
                                 }
                             }
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     mAdapter = new MyAdapter(mFeatureItem);
+
                                     recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
                                     mLinearLayout = new LinearLayoutManager(getActivity());
                                     recyclerView.setLayoutManager(mLinearLayout);
                                     recyclerView.setAdapter(mAdapter);
                                 }
                             });
+
                         }else{
                             if(portal.getLoadStatus() == LoadStatus.FAILED_TO_LOAD){
                                 Snackbar.make(getActivity().findViewById(R.id.nav_view), "The provided credentials not valid for "+
@@ -219,7 +226,7 @@ public class PortalViewFragment extends Fragment {
                         Log.d("Exception", exception.getMessage());
                     }
                 }
-            });*/
+            });
 
 
             return null;
