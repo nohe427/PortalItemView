@@ -29,4 +29,8 @@
     <string name="image_description">launcher_logo</string>
     <string name="esri">esri</string>
     <string name="sign_in_to_arcgis_online_or_your_portal">Sign in to arcgis online or your portal</string>
+    <string name="arcgis.com" />
+    <string name="arcgis">www.arcgis.com</string>
+    <string name="portal">Your portal (<![CDATA[eg. http://<host>:<port>/arcgis]]>)</string>
+    <string name="portal_example"></string>
 </resources>

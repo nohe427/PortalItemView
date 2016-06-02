@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
-    android:background="@drawable/side_nav_bar"
     android:gravity="bottom"
     android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
@@ -11,13 +10,13 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
     android:weightSum="1"
-    android:backgroundTintMode="add">
+    android:backgroundTintMode="add"
+    android:background="@color/background_floating_material_dark">
 
     <ImageView
         android:id="@+id/screen_image"
-        android:layout_width="180dp"
+        android:layout_width="150dp"
         android:layout_height="100dp"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:src="@mipmap/nopic"
         android:layout_weight="0.34" />
 

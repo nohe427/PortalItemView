@@ -1,6 +1,5 @@
 package test.support.esri.com.portalitemview;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -11,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 
@@ -29,8 +29,6 @@ public class LogInFragment extends Fragment {
     private static final String PASSWORD = "password";
     private OnFragmentInteractionListener mListener;
 
-    private Activity containingActivity;
-
     // TODO: Rename and change types of parameters
     private String username;
     private String password;
@@ -39,6 +37,9 @@ public class LogInFragment extends Fragment {
     static EditText txtUsername;
     static EditText txtPassword;
     private View mainView;
+    private RadioButton radio_portal;
+    private RadioButton radio_arcgis;
+    private EditText txtPortalURL;
 
 
     public LogInFragment() {
@@ -72,6 +73,8 @@ public class LogInFragment extends Fragment {
         }
 
 
+
+
     }
 
     /**
@@ -80,6 +83,15 @@ public class LogInFragment extends Fragment {
 
     private void loginToPortal() {
         //check for empty content
+
+        if(radio_portal.isChecked() && txtPortalURL.getText().toString().length() == 0){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mainView.getContext(), "Please provide a portal url", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
 
         if(txtUsername.getText().toString().length() == 0 && txtPassword.getText().toString().length() == 0){
             getActivity().runOnUiThread(new Runnable() {
@@ -106,6 +118,7 @@ public class LogInFragment extends Fragment {
         getActivity().startActivityFromFragment(this, navigatorIntent, 1);
 }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -116,6 +129,11 @@ public class LogInFragment extends Fragment {
         loginButton = (Button)mainView.findViewById(R.id.loginbutton);
         txtUsername = (EditText)mainView.findViewById(R.id.portal_username);
         txtPassword = (EditText)mainView.findViewById(R.id.portal_password);
+        radio_arcgis = (RadioButton)mainView.findViewById(R.id.radio_arcgis);
+        radio_portal = (RadioButton)mainView.findViewById(R.id.radio_portal);
+        txtPortalURL = (EditText)mainView.findViewById(R.id.portal_url);
+        txtPortalURL.setVisibility(View.GONE);
+        radio_arcgis.setChecked(true);
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,8 +148,33 @@ public class LogInFragment extends Fragment {
                 loginToPortal();
             }
         });
+
+       radio_portal.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               if(radio_portal.isChecked()){
+                   txtPortalURL.setVisibility(View.VISIBLE);
+               }else{
+                   txtPortalURL.setVisibility(View.GONE);
+               }
+           }
+       });
+
+        radio_arcgis.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(radio_arcgis.isChecked()){
+                    txtPortalURL.setVisibility(View.GONE);
+                }else{
+                    txtPortalURL.setVisibility(View.VISIBLE);
+                }
+            }
+        });
         return  mainView;
     }
+
+
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

@@ -27,7 +27,8 @@ PortalViewFragment.OnFragmentInteractionListener{
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction().add(R.id.fullscreen_layout,
+                FragmentTransaction fragTransaction = getSupportFragmentManager()
+                        .beginTransaction().add(R.id.fullscreen_layout,
                         new LogInFragment(), "LoginFragment");
                 fragTransaction.commit();
                 signInButton.setVisibility(View.GONE);
