@@ -191,6 +191,7 @@ public class PortalViewFragment extends Fragment {
                             //provide your queries
                             PortalQueryParams portalQueryParams = new PortalQueryParams();
                             portalQueryParams.setCanSearchPublic(true);
+                            portalQueryParams.setQuery("owner: "+username);
                             ListenableFuture<PortalQueryResultSet<PortalItem>> portalListItems =
                                     portal.findItemsAsync(portalQueryParams);//"owner: "+username
                             List<PortalItem> portalItems = portalListItems.get().getResults();
