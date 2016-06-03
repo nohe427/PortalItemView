@@ -3,7 +3,6 @@ package test.support.esri.com.portalitemview;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,11 +45,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
         TextView holderNameView = (TextView) holder.viewTextView;
         TextView holderDescView = (TextView) holder.viewDescView;
+        TextView holderOwnerView = (TextView)holder.itemOwner;
 
         final ImageView holderImageView = holder.imageView;
         holderNameView.setText(portalDataset.get(position).getPortalItemTitle());
         holderImageView.setImageBitmap(portalDataset.get(position).getmBitmap());
         holderDescView.setText(portalDataset.get(position).getPortalItem().getDescription());
+        holderOwnerView.setText("Owner: "+portalDataset.get(position).getPortalItem().getOwner());
         holderImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
@@ -61,16 +62,15 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                         @Override
                         public void run() {
                             if (portalMap.getLoadStatus() == LoadStatus.LOADED) {
-                                fragmentManager.beginTransaction().remove(fragmentManager.findFragmentByTag("recycler_view_fragment"))
+                                fragmentManager.beginTransaction().detach(fragmentManager.findFragmentByTag("recycler_view_fragment"))
                                         .commit();
                                 MapView realMapView = (MapView) fragmentManager.findFragmentByTag("recycler_view_fragment").getActivity()
                                         .findViewById(R.id.nav_map_view);
                                 realMapView.setMap(portalMap);
-                                Log.d("Kwasi", portalMap.getOperationalLayers().get(0).getName());
                                 Toast.makeText(v.getContext(), "Loaded", Toast.LENGTH_SHORT).show();
                             } else if (portalMap.getLoadStatus() == LoadStatus.FAILED_TO_LOAD) {
-                                Snackbar.make(v, "Yo man the map did not load \n" +
-                                                "because; " + portalMap.getLoadError().getMessage(),
+                                Snackbar.make(v, "Yo man the map did not load because \n" +
+                                                " " + portalMap.getLoadError().getMessage(),
                                         Snackbar.LENGTH_LONG).show();
                             }
                         }
@@ -90,15 +90,17 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     public class ViewHolder extends RecyclerView.ViewHolder {
         View viewTextView;
         View viewDescView;
+        View itemOwner;
         ImageView imageView;
         MapView map_view;
 
         public ViewHolder(View view) {
             super(view);
-            this.viewTextView = view.findViewById(R.id.view_text);
+            this.viewTextView = view.findViewById(R.id.item_title);
             this.imageView = (ImageView) view.findViewById(R.id.thumbnail);
             this.viewDescView = view.findViewById(R.id.map_desc);
             this.map_view = (MapView) view.findViewById(R.id.nav_map_view);
+            this.itemOwner = view.findViewById(R.id.owner);
         }
     }
 }

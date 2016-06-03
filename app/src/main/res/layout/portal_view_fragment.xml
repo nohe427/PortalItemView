@@ -5,8 +5,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        tools:context="test.support.esri.com.portalitemview.PortalViewFragment"
-        android:background="@android:color/darker_gray">
+        tools:context="test.support.esri.com.portalitemview.PortalViewFragment">
 
 <!--
         <RelativeLayout

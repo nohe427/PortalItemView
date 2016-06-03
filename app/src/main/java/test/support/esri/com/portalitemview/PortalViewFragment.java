@@ -140,7 +140,6 @@ public class PortalViewFragment extends Fragment {
     }
 
     public class PortalViewAsyncTask extends AsyncTask<Void, Void, Void> {
-        private Exception mException;
         private Portal portal;
         public PortalViewAsyncTask(){
 
@@ -148,7 +147,7 @@ public class PortalViewFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... params) {
-            mException= null;
+
             portal = new Portal("http://www.arcgis.com", new UserCredential(username, password));
             portal.loadAsync();
             portal.addDoneLoadingListener(new Runnable() {
@@ -160,8 +159,7 @@ public class PortalViewFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     try {
-                                       Log.d("KwasiD", getActivity().getLocalClassName());
-                                        Snackbar.make(getActivity().findViewById(R.id.nav_view), "Portal loaded for: "+
+                                        Snackbar.make(getActivity().findViewById(R.id.nav_view), "Portal loaded for "+
                                         portal.getPortalUser().getFullName(), Snackbar.LENGTH_LONG).show();
                                         TextView screen_name = (TextView) getActivity().findViewById(R.id.screen_name);
                                         screen_name.setText("Welcome " + portal.getPortalUser().getFullName());
@@ -191,8 +189,10 @@ public class PortalViewFragment extends Fragment {
                             }
 
                             //provide your queries
+                            PortalQueryParams portalQueryParams = new PortalQueryParams();
+                            portalQueryParams.setCanSearchPublic(true);
                             ListenableFuture<PortalQueryResultSet<PortalItem>> portalListItems =
-                                    portal.findItemsAsync(new PortalQueryParams("owner: "+username));
+                                    portal.findItemsAsync(portalQueryParams);//"owner: "+username
                             List<PortalItem> portalItems = portalListItems.get().getResults();
                             for (PortalItem portalItem : portalItems) {
                                 byte[] data = portalItem.fetchThumbnailAsync().get();

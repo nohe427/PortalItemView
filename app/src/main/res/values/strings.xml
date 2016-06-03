@@ -33,4 +33,5 @@
     <string name="arcgis">www.arcgis.com</string>
     <string name="portal">Your portal (<![CDATA[eg. http://<host>:<port>/arcgis]]>)</string>
     <string name="portal_example"></string>
+    <string name="portal_item_thumbnail">portal item thumbnail</string>
 </resources>
