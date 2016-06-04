@@ -98,10 +98,7 @@ public class PortalViewFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-
         viewRecycler = inflater.from(container.getContext()).inflate(R.layout.content_portal_view,container, false);
-
         // Inflate the layout for this fragment
        view =inflater.inflate(R.layout.portal_view_fragment, container, false);
          return view;
@@ -159,7 +156,7 @@ public class PortalViewFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     try {
-                                        Snackbar.make(getActivity().findViewById(R.id.nav_view), "Portal loaded for "+
+                                        Snackbar.make(getActivity().findViewById(R.id.nav_map_view), "Portal loaded for "+
                                         portal.getPortalUser().getFullName(), Snackbar.LENGTH_LONG).show();
                                         TextView screen_name = (TextView) getActivity().findViewById(R.id.screen_name);
                                         screen_name.setText("Welcome " + portal.getPortalUser().getFullName());
@@ -190,8 +187,7 @@ public class PortalViewFragment extends Fragment {
 
                             //provide your queries
                             PortalQueryParams portalQueryParams = new PortalQueryParams();
-                            portalQueryParams.setCanSearchPublic(true);
-                            portalQueryParams.setQuery("owner: "+username);
+                            portalQueryParams.setQuery("owner: "+portal.getPortalUser().getUserName());
                             ListenableFuture<PortalQueryResultSet<PortalItem>> portalListItems =
                                     portal.findItemsAsync(portalQueryParams);//"owner: "+username
                             List<PortalItem> portalItems = portalListItems.get().getResults();

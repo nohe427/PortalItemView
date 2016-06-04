@@ -16,6 +16,9 @@ import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.portal.PortalItemType;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
 
 /**
  * Created by kwas7493 on 4/1/2016.
@@ -46,12 +49,23 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         TextView holderNameView = (TextView) holder.viewTextView;
         TextView holderDescView = (TextView) holder.viewDescView;
         TextView holderOwnerView = (TextView)holder.itemOwner;
+        TextView holderDateModified = (TextView)holder.dateModified;
+        TextView holderNumOfView = (TextView)holder.numOfViews;
+        TextView holderNumOfRating = (TextView)holder.numOfRating;
 
         final ImageView holderImageView = holder.imageView;
-        holderNameView.setText(portalDataset.get(position).getPortalItemTitle());
+        holderNameView.setText(" Item Title: "+portalDataset.get(position).getPortalItemTitle());
         holderImageView.setImageBitmap(portalDataset.get(position).getmBitmap());
         holderDescView.setText(portalDataset.get(position).getPortalItem().getDescription());
-        holderOwnerView.setText("Owner: "+portalDataset.get(position).getPortalItem().getOwner());
+        holderOwnerView.setText(" Owner: "+portalDataset.get(position).getPortalItem().getOwner());
+        Date date = new Date(portalDataset.get(position).getPortalItem().getModified());
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+
+        holderDateModified.setText(" Date modified: "+ cal.get(Calendar.MONTH) +"/"+cal.get(Calendar.DAY_OF_MONTH) +"/"+
+        cal.get(Calendar.YEAR));
+        holderNumOfRating.setText(" Item rated as a "+portalDataset.get(position).getPortalItem().getNumRatings());
+        holderNumOfView.setText(" "+portalDataset.get(position).getPortalItem().getNumViews()+" views");
         holderImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
@@ -93,6 +107,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         View itemOwner;
         ImageView imageView;
         MapView map_view;
+        View numOfViews;
+        View numOfRating;
+        View dateModified;
 
         public ViewHolder(View view) {
             super(view);
@@ -101,6 +118,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             this.viewDescView = view.findViewById(R.id.map_desc);
             this.map_view = (MapView) view.findViewById(R.id.nav_map_view);
             this.itemOwner = view.findViewById(R.id.owner);
+            this.dateModified = view.findViewById(R.id.date_modified);
+            this.numOfViews = view.findViewById(R.id.num_views);
+            this.numOfRating = view.findViewById(R.id.num_ratings);
         }
     }
 }

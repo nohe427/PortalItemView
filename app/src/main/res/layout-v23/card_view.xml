@@ -44,13 +44,12 @@
             android:id="@+id/item_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#0d0c0c"
-            android:textSize="@dimen/abc_text_size_subhead_material"
             android:textAlignment="textStart"
             android:text="title"
             android:layout_alignParentEnd="true"
             android:layout_toEndOf="@+id/thumbnail"
-            android:layout_below="@+id/owner" />
+            android:layout_below="@+id/owner"
+            android:textSize="15sp" />
 
         <TextView
             android:layout_width="match_parent"
@@ -59,9 +58,38 @@
             android:id="@+id/owner"
             android:layout_toRightOf="@+id/thumbnail"
             android:text="owner"
-            android:textSize="@dimen/abc_text_size_subhead_material" />
+            android:textSize="15sp" />
 
-            </RelativeLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/num_views"
+            android:id="@+id/num_views"
+            android:textSize="15dp"
+            android:layout_below="@+id/item_title"
+            android:layout_toEndOf="@+id/thumbnail" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/num_rating"
+            android:id="@+id/num_ratings"
+            android:layout_below="@+id/num_views"
+            android:layout_toEndOf="@+id/thumbnail"
+            android:textSize="15dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/date_modified"
+            android:id="@+id/date_modified"
+            android:layout_below="@+id/num_ratings"
+            android:layout_toEndOf="@+id/thumbnail"
+            android:textSize="15dp" />
+
+    </RelativeLayout>
 
         <TextView
             android:layout_width="match_parent"
