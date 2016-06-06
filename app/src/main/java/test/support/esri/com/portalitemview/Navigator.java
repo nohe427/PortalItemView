@@ -2,6 +2,8 @@ package test.support.esri.com.portalitemview;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -17,7 +19,9 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -35,7 +39,7 @@ import java.util.ArrayList;
 public class Navigator extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LogInFragment.OnFragmentInteractionListener, PortalViewFragment.OnFragmentInteractionListener{
 private MapView navMapView;
-    private Map nap_map;
+    private Map navigationMap;
     private NavigationView navigationView;
     private static String USERNAME;
     private static String PASSWORD;
@@ -55,11 +59,12 @@ private MapView navMapView;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigator);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-
+       Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        handleIntent(getIntent());
         navMapView = (MapView)findViewById(R.id.nav_map_view);
-        nap_map = new Map(Basemap.createLightGrayCanvas());
-        navMapView.setMap(nap_map);
+        navigationMap = new Map(Basemap.createLightGrayCanvas());
+        navMapView.setMap(navigationMap);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -103,6 +108,20 @@ private MapView navMapView;
         fragmentTransaction.add(R.id.nav_map_view, portalViewFragment, "recycler_view_fragment").commit();
     }
 
+
+    private void handleIntent(Intent intent){
+        if(Intent.ACTION_SEARCH.equals(intent.getAction())){
+            String query = intent.getStringExtra(SearchManager.QUERY);
+        }
+    }
+
+
+    @Override
+    protected void onNewIntent(Intent intent){
+        handleIntent(intent);
+    }
+
+
     @Override
     protected void onResume(){
             super.onResume();
@@ -137,12 +156,18 @@ private MapView navMapView;
         }
     }
 
-    /*@Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.navigator, menu);
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.options_menu, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView)menu.findItem(R.id.test_search_bar).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
         return true;
-    }*/
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

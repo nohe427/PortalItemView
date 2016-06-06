@@ -8,4 +8,10 @@
         android:title="@string/action_settings"
         app:showAsAction="never"
         android:icon="@drawable/ic_settings_black_24dp"/>
+    <item
+        android:id="@+id/search_bar"
+        android:title="@string/arcgis"
+        android:icon="@drawable/places_ic_search"
+        android:actionViewClass="android.widget.SearchView"
+        android:showAsAction="collapseActionView|ifRoom"/>
 </menu>

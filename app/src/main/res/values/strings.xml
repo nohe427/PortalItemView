@@ -37,4 +37,6 @@
     <string name="num_views">num_views</string>
     <string name="num_rating">num_ratings</string>
     <string name="date_modified">date_modified</string>
+    <string name="search_icon">search places</string>
+    <string name="search_hint">search for places</string>
 </resources>

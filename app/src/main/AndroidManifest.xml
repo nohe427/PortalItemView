@@ -22,10 +22,13 @@
         <activity
             android:name=".Navigator"
             android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name=".Navigator"
+                android:resource="@xml/searchable" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
-                <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+                <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
         <activity
@@ -47,7 +50,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-               <!-- <category android:name="android.intent.category.LAUNCHER" />-->
+                <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             </intent-filter>
         </activity>
         <activity

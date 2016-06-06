@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item
+        android:id="@+id/searchable"
+        android:title="@string/search_icon"
+        app:showAsAction="collapseActionView|ifRoom"
+        android:icon="@drawable/places_ic_search"
+        android:actionViewClass="android.widget.SearchView"/>
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_login"
