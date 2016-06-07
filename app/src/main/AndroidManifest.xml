@@ -16,45 +16,19 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-
-        <!-- android:theme="@style/Theme.AppCompat.Light.NoActionBar" -->
-        <!-- android:label="@string/app_name" -->
         <activity
             android:name=".Navigator"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
-                android:name=".Navigator"
-                android:resource="@xml/searchable" />
+                android:name="android.app.default_searchable"
+                android:value=".GeocodeResults" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".PortalView"
-            android:label="@string/title_activity_portal_view"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".TabbedHolderActivity"
-            android:label="@string/title_activity_tabbed_holder"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".AppLauncherActivity"
+            android:name=".Launcher"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/app_name"
             android:theme="@style/FullscreenTheme">
@@ -63,6 +37,15 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".GeocodeResults">
+           <meta-data android:name="android.app.searchable"
+               android:resource="@xml/searchable"/>
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH"/>
+            </intent-filter>
+
+
         </activity>
     </application>
 

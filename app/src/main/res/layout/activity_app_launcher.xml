@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/wallet_bright_foreground_disabled_holo_light"
-    tools:context="test.support.esri.com.portalitemview.AppLauncherActivity">
+    tools:context=".Launcher">
 
 
     <TextView

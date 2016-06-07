@@ -11,7 +11,7 @@ import android.widget.Button;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class AppLauncherActivity extends AppCompatActivity implements LogInFragment.OnFragmentInteractionListener,
+public class Launcher extends AppCompatActivity implements LogInFragment.OnFragmentInteractionListener,
 PortalViewFragment.OnFragmentInteractionListener{
 
     private Button signInButton;
