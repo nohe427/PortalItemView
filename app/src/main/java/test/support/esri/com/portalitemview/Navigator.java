@@ -151,6 +151,8 @@ private MapView navMapView;
         SearchView searchView = (SearchView)menu.findItem(R.id.searchable).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconified(false);
+        searchView.setSubmitButtonEnabled(true);
+
         return true;
     }
 
