@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
+import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.tasks.geocode.GeocodeParameters;
 import com.esri.arcgisruntime.tasks.geocode.GeocodeResult;
@@ -25,7 +26,7 @@ public class GeocodeResults extends Activity {
     private GeocodeAdapter geocodeAdapter;
     private RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
-    private ArrayList<String> geocodeAdapterData;
+    private GeocodeData geocodeAdapterData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,12 +66,16 @@ public class GeocodeResults extends Activity {
                             try {
                                 ListenableFuture<List<GeocodeResult>> geocodeResults = locatorTask.geocodeAsync(query, geocodeParameters);
                                 List<GeocodeResult> list_geocoded = geocodeResults.get();
-                                geocodeAdapterData = new ArrayList<>();
+
+                                ArrayList<String> labelData = new ArrayList<>();
+                                ArrayList<Point> pointData = new ArrayList<>();
                                 int counter =0;
                                 for(GeocodeResult geocodeResult : list_geocoded){
-                                    geocodeAdapterData.add(counter, geocodeResult.getLabel());
+                                    labelData.add(counter, geocodeResult.getLabel());
+                                    pointData.add(counter, geocodeResult.getDisplayLocation());
                                     counter++;
                                 }
+                                geocodeAdapterData = new GeocodeData(labelData, pointData);
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {

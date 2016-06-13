@@ -6,16 +6,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.esri.arcgisruntime.geometry.Point;
 
 /**
  * Created by kwas7493 on 6/8/2016.
  */
 public class GeocodeAdapter extends RecyclerView.Adapter<GeocodeAdapter.ViewHolder> {
     View recyclerView;
-    ArrayList<String> geocodeResults;
-    public GeocodeAdapter(ArrayList<String> geocodePossibles){
-        this.geocodeResults = geocodePossibles;
+    GeocodeData dataGeocoded;
+    public GeocodeAdapter(GeocodeData geocodeData){
+        this.dataGeocoded = geocodeData;
     }
 
     @Override
@@ -26,14 +26,20 @@ public class GeocodeAdapter extends RecyclerView.Adapter<GeocodeAdapter.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         TextView geocodeText = holder.innnerText;
-        geocodeText.setText(geocodeResults.get(position));
+        geocodeText.setText(dataGeocoded.getLabelName().get(position));
+        geocodeText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Point point = dataGeocoded.getLocationPoint().get(position);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return geocodeResults.size();
+        return dataGeocoded.getSize();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
