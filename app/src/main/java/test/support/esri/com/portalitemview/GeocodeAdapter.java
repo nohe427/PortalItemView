@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * Created by kwas7493 on 6/8/2016.
  */
 public class GeocodeAdapter extends RecyclerView.Adapter<GeocodeAdapter.ViewHolder> {
-    RecyclerView recyclerView;
+    View recyclerView;
     ArrayList<String> geocodeResults;
     public GeocodeAdapter(ArrayList<String> geocodePossibles){
         this.geocodeResults = geocodePossibles;
@@ -20,7 +20,7 @@ public class GeocodeAdapter extends RecyclerView.Adapter<GeocodeAdapter.ViewHold
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        recyclerView = (RecyclerView) LayoutInflater.from(parent.getContext()).inflate(R.layout.geocodeshow, parent, false);
+        recyclerView = LayoutInflater.from(parent.getContext()).inflate(R.layout.geocodeshow, parent, false);
         ViewHolder viewHolder = new ViewHolder(recyclerView);
         return viewHolder;
     }
@@ -33,7 +33,7 @@ public class GeocodeAdapter extends RecyclerView.Adapter<GeocodeAdapter.ViewHold
 
     @Override
     public int getItemCount() {
-        return 0;
+        return geocodeResults.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

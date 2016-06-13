@@ -54,7 +54,7 @@ public class PortalViewFragment extends Fragment {
 
     private View viewRecycler;
     private View view;
-    private ArrayList<FeatureItem> mFeatureItem;
+    private ArrayList<CardViewData> mCardViewData;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView recyclerView;
     private LinearLayoutManager mLinearLayout;
@@ -179,7 +179,7 @@ public class PortalViewFragment extends Fragment {
                             });
 
                             //initialize ArrayList
-                            mFeatureItem = new ArrayList<>();
+                            mCardViewData = new ArrayList<>();
                             //return if cancelled
                             if (isCancelled()) {
                                 return;
@@ -200,14 +200,14 @@ public class PortalViewFragment extends Fragment {
                                 if (data != null) {
                                     Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                                     if(portalItem.getType() == PortalItemType.WEBMAP)
-                                    mFeatureItem.add(new FeatureItem(portalItem, bitmap, new Map(portalItem)));
+                                    mCardViewData.add(new CardViewData(portalItem, bitmap, new Map(portalItem)));
 
                                 }
                             }
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    mAdapter = new MyAdapter(mFeatureItem, getActivity().getSupportFragmentManager());
+                                    mAdapter = new CardViewAdapter(mCardViewData, getActivity().getSupportFragmentManager());
                                     recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
                                     mLinearLayout = new LinearLayoutManager(getActivity());
                                     recyclerView.setLayoutManager(mLinearLayout);
@@ -223,10 +223,10 @@ public class PortalViewFragment extends Fragment {
                                 Snackbar.make(getActivity().findViewById(R.id.nav_view), "The provided credentials not valid for "+
                                 portal.getUrl(), Snackbar.LENGTH_LONG).show();
                             }
-                        }
-                    } catch (ExecutionException | InterruptedException exception) {
-                        Log.d("Exception", exception.getMessage());
-                    }
+                }
+            } catch (ExecutionException | InterruptedException exception) {
+                Log.d("Exception", exception.getMessage());
+            }
                 }
             });
 

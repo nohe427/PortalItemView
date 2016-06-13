@@ -35,7 +35,7 @@ import com.esri.arcgisruntime.security.UserCredential;
 import java.util.ArrayList;
 
 
-public class Navigator extends AppCompatActivity
+public class PortalViewMain extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LogInFragment.OnFragmentInteractionListener, PortalViewFragment.OnFragmentInteractionListener{
 private MapView navMapView;
     private Map navigationMap;
@@ -46,7 +46,7 @@ private MapView navMapView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView recyclerView;
     private LinearLayoutManager mLinearLayout;
-    private ArrayList<FeatureItem> mFeatureItem;
+    private ArrayList<CardViewData> mCardViewData;
     private static final int RETURN_USER_RESPONSE=0;
     private FragmentTransaction fragmentTransaction;
     private FragmentManager fragmentManager;

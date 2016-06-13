@@ -8,12 +8,12 @@ import com.esri.arcgisruntime.portal.PortalItem;
 /**
  * Created by kwas7493 on 4/5/2016.
  */
-public class FeatureItem {
+public class CardViewData {
     PortalItem mPortalItem;
     Bitmap mBitmap;
     Map map;
 
-    public FeatureItem(PortalItem portalItem, Bitmap bitmap, Map portalMap){
+    public CardViewData(PortalItem portalItem, Bitmap bitmap, Map portalMap){
         this.mBitmap = bitmap;
         this.mPortalItem = portalItem;
         this.map = portalMap;

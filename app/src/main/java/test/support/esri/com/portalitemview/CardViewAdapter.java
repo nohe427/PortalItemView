@@ -23,13 +23,13 @@ import java.util.Date;
 /**
  * Created by kwas7493 on 4/1/2016.
  */
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
-    ArrayList<FeatureItem> portalDataset;
+public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.ViewHolder> {
+    ArrayList<CardViewData> portalDataset;
     MapView mapView;
     View view;
     FragmentManager fragmentManager;
 
-    public MyAdapter(ArrayList<FeatureItem> mPortalDataset, FragmentManager appFragmentManager) {
+    public CardViewAdapter(ArrayList<CardViewData> mPortalDataset, FragmentManager appFragmentManager) {
         portalDataset = mPortalDataset;
         fragmentManager = appFragmentManager;
     }
