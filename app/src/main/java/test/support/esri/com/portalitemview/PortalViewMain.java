@@ -1,17 +1,14 @@
 package test.support.esri.com.portalitemview;
 
-import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -24,10 +21,11 @@ import android.view.MenuItem;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.esri.arcgisruntime.geometry.Point;
+import com.esri.arcgisruntime.geometry.SpatialReference;
 import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.mapping.Basemap;
 import com.esri.arcgisruntime.mapping.Map;
-import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.portal.Portal;
 import com.esri.arcgisruntime.security.UserCredential;
@@ -89,14 +87,14 @@ private MapView navMapView;
         }
         navigationView.setNavigationItemSelectedListener(this);
 
-        if(ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+        /*if(ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED){
         LocationDisplay locationDisplay = navMapView.getLocationDisplay();
         locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.NAVIGATION);
         locationDisplay.startAsync();
         }else{
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, RETURN_USER_RESPONSE);
-        }
+            requestPermissions(new String[]{permission.ACCESS_FINE_LOCATION}, RETURN_USER_RESPONSE);
+        }*/
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         PortalViewFragment portalViewFragment = new PortalViewFragment();
         Bundle argBundle = new Bundle();
@@ -104,6 +102,14 @@ private MapView navMapView;
         argBundle.putString("PASSWORD", getIntent().getStringExtra("PASSWORD"));
         portalViewFragment.setArguments(argBundle);
         fragmentTransaction.add(R.id.nav_map_view, portalViewFragment, "recycler_view_fragment").commit();
+
+        //if the activity is started by the geocode activity
+        double[] doubleArray = getIntent().getDoubleArrayExtra("point");
+        if(doubleArray !=null){
+            Point point = new Point(doubleArray[0], doubleArray[1],
+                    SpatialReference.create(new Double(doubleArray[2]).intValue()));
+            navMapView.setViewpointCenterWithScaleAsync(point, 100);
+        }
     }
 
 

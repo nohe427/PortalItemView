@@ -88,6 +88,9 @@ public class PortalViewFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /*if(getActivity().getIntent().getStringExtra("point") == null){
+
+        }*/
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -144,6 +147,9 @@ public class PortalViewFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... params) {
+            if(username == null && password == null){
+                return null;
+            }
 
             portal = new Portal("http://www.arcgis.com", new UserCredential(username, password));
             portal.loadAsync();

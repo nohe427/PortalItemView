@@ -1,5 +1,6 @@
 package test.support.esri.com.portalitemview;
 
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +12,7 @@ import com.esri.arcgisruntime.geometry.Point;
 /**
  * Created by kwas7493 on 6/8/2016.
  */
-public class GeocodeAdapter extends RecyclerView.Adapter<GeocodeAdapter.ViewHolder> {
+public class GeocodeAdapter extends RecyclerView.Adapter<GeocodeAdapter.ViewHolder>{
     View recyclerView;
     GeocodeData dataGeocoded;
     public GeocodeAdapter(GeocodeData geocodeData){
@@ -33,6 +34,14 @@ public class GeocodeAdapter extends RecyclerView.Adapter<GeocodeAdapter.ViewHold
             @Override
             public void onClick(View v) {
                 Point point = dataGeocoded.getLocationPoint().get(position);
+                Intent intent = new Intent(v.getContext(), PortalViewMain.class);
+                double[] coordinates = {point.getX(), point.getY(),
+                        new Integer(point.getSpatialReference().getWKID()).doubleValue()};
+                intent.putExtra("point", coordinates);
+                    v.getContext().startActivity(intent);
+                /*mapView.setMap(new Map(Basemap.createLightGrayCanvas()));
+                mapView.setViewpointCenterAsync(point);
+                Toast.makeText(v.getContext(), "Map point is: "+point.getX(), Toast.LENGTH_LONG).show();*/
             }
         });
     }
