@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -84,7 +85,7 @@ public class LogInFragment extends Fragment {
     private void loginToPortal() {
         //check for empty content
 
-        if(radio_portal.isChecked() && txtPortalURL.getText().toString().length() == 0){
+        if(radio_arcgis.isChecked() || radio_portal.isChecked() && txtPortalURL.getText().toString().length() == 0){
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -154,6 +155,8 @@ public class LogInFragment extends Fragment {
            public void onClick(View v) {
                if(radio_portal.isChecked()){
                    txtPortalURL.setVisibility(View.VISIBLE);
+                   ((TextInputLayout)getActivity().findViewById(R.id.input_layout_password)).setHint("portal password");
+                   ((TextInputLayout)getActivity().findViewById(R.id.input_layout_username)).setHint("portal username");
                }else{
                    txtPortalURL.setVisibility(View.GONE);
                }
@@ -165,11 +168,14 @@ public class LogInFragment extends Fragment {
             public void onClick(View v) {
                 if(radio_arcgis.isChecked()){
                     txtPortalURL.setVisibility(View.GONE);
+                    ((TextInputLayout)getActivity().findViewById(R.id.input_layout_password)).setHint("arcgis online password");
+                    ((TextInputLayout)getActivity().findViewById(R.id.input_layout_username)).setHint("arcgis online username");
                 }else{
                     txtPortalURL.setVisibility(View.VISIBLE);
                 }
             }
         });
+
         return  mainView;
     }
 

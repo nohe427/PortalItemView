@@ -61,14 +61,14 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/portal_username"
-                android:hint="@string/username"
                 android:layout_above="@+id/portal_password"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentStart="true"
                 android:layout_row="0"
                 android:layout_column="0"
                 android:textAlignment="center"
-                android:textColor="@color/abc_primary_text_material_dark" />
+                android:textColor="@color/abc_primary_text_material_dark"
+                android:hint="@string/username" />
 
 
         </android.support.design.widget.TextInputLayout>
@@ -87,12 +87,12 @@
                 android:inputType="textPassword"
                 android:ems="10"
                 android:id="@+id/portal_password"
-                android:hint="@string/password"
                 android:layout_centerVertical="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentEnd="true"
                 android:textColor="@color/abc_primary_text_disable_only_material_dark"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:hint="@string/password" />
         </android.support.design.widget.TextInputLayout>
 
         <Button
