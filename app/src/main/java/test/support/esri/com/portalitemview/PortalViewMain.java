@@ -1,23 +1,26 @@
 package test.support.esri.com.portalitemview;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -26,29 +29,21 @@ import com.esri.arcgisruntime.geometry.SpatialReference;
 import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.mapping.Basemap;
 import com.esri.arcgisruntime.mapping.Map;
+import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.portal.Portal;
 import com.esri.arcgisruntime.security.UserCredential;
 
-import java.util.ArrayList;
-
 
 public class PortalViewMain extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, LogInFragment.OnFragmentInteractionListener, PortalViewFragment.OnFragmentInteractionListener{
+        implements NavigationView.OnNavigationItemSelectedListener, LogInFragment.OnFragmentInteractionListener, PortalViewFragment.OnFragmentInteractionListener,
+BasemapFragment.OnFragmentInteractionListener{
 private MapView navMapView;
     private Map navigationMap;
     private NavigationView navigationView;
-    private static String USERNAME;
-    private static String PASSWORD;
     private Portal portal;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView recyclerView;
-    private LinearLayoutManager mLinearLayout;
-    private ArrayList<CardViewData> mCardViewData;
-    private static final int RETURN_USER_RESPONSE=0;
     private FragmentTransaction fragmentTransaction;
     private FragmentManager fragmentManager;
-    private LogInFragment logInFragment;
     private  String menuTitle;
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -61,6 +56,9 @@ private MapView navMapView;
         navMapView = (MapView)findViewById(R.id.nav_map_view);
         navigationMap = new Map(Basemap.createLightGrayCanvas());
         navMapView.setMap(navigationMap);
+        navMapView.setMagnifierEnabled(true);
+        navMapView.setCanMagnifierPanMap(true);
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -87,15 +85,37 @@ private MapView navMapView;
         }
         navigationView.setNavigationItemSelectedListener(this);
 
-        /*if(ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+        //Location display implementation
+        FloatingActionButton actionButton = (FloatingActionButton)findViewById(R.id.location_floater);
+        actionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED){
         LocationDisplay locationDisplay = navMapView.getLocationDisplay();
         locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.NAVIGATION);
         locationDisplay.startAsync();
         }else{
-            requestPermissions(new String[]{permission.ACCESS_FINE_LOCATION}, RETURN_USER_RESPONSE);
-        }*/
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
+            }
+        });
+
+        //basemap show implementation
+        FloatingActionButton basemapActionButton = (FloatingActionButton)findViewById(R.id.base_map);
+        basemapActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                BasemapFragment basemapFragment = new BasemapFragment();
+                transaction.add(R.id.nav_map_view, basemapFragment, "basemap fragment").commit();
+            }
+        });
+
+
+
+
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         PortalViewFragment portalViewFragment = new PortalViewFragment();
         Bundle argBundle = new Bundle();
         argBundle.putString("USERNAME",getIntent().getStringExtra("USERNAME"));
