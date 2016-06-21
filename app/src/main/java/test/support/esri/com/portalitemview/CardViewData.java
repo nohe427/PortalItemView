@@ -2,7 +2,7 @@ package test.support.esri.com.portalitemview;
 
 import android.graphics.Bitmap;
 
-import com.esri.arcgisruntime.mapping.Map;
+import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.portal.PortalItem;
 
 /**
@@ -11,9 +11,9 @@ import com.esri.arcgisruntime.portal.PortalItem;
 public class CardViewData {
     PortalItem mPortalItem;
     Bitmap mBitmap;
-    Map map;
+    ArcGISMap map;
 
-    public CardViewData(PortalItem portalItem, Bitmap bitmap, Map portalMap){
+    public CardViewData(PortalItem portalItem, Bitmap bitmap, ArcGISMap portalMap){
         this.mBitmap = bitmap;
         this.mPortalItem = portalItem;
         this.map = portalMap;
@@ -38,7 +38,7 @@ public class CardViewData {
         return mBitmap;
     }
 
-    public Map getPortalMap(){
+    public ArcGISMap getPortalMap(){
         assert map !=null;
               return map;
     }

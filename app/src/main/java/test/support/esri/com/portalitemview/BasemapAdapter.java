@@ -6,8 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.Basemap;
-import com.esri.arcgisruntime.mapping.Map;
 import com.esri.arcgisruntime.mapping.view.MapView;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class BasemapAdapter extends RecyclerView.Adapter<BasemapAdapter.ViewHold
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
            final MapView mapView = holder.basemap_mapView;
-            final Map map = new Map(basemaps.get(position));
+            final ArcGISMap map = new ArcGISMap(basemaps.get(position));
             map.loadAsync();
         Log.d("KwasiError", map.getLoadStatus().toString());
 

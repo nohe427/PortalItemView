@@ -27,8 +27,8 @@ import android.widget.Toast;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.geometry.SpatialReference;
 import com.esri.arcgisruntime.loadable.LoadStatus;
+import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.Basemap;
-import com.esri.arcgisruntime.mapping.Map;
 import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.portal.Portal;
@@ -39,7 +39,7 @@ public class PortalViewMain extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LogInFragment.OnFragmentInteractionListener, PortalViewFragment.OnFragmentInteractionListener,
 BasemapFragment.OnFragmentInteractionListener{
 private MapView navMapView;
-    private Map navigationMap;
+    private ArcGISMap navigationMap;
     private NavigationView navigationView;
     private Portal portal;
     private FragmentTransaction fragmentTransaction;
@@ -54,7 +54,7 @@ private MapView navMapView;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         navMapView = (MapView)findViewById(R.id.nav_map_view);
-        navigationMap = new Map(Basemap.createLightGrayCanvas());
+        navigationMap = new ArcGISMap(Basemap.createLightGrayCanvas());
         navMapView.setMap(navigationMap);
         navMapView.setMagnifierEnabled(true);
         navMapView.setCanMagnifierPanMap(true);
@@ -102,8 +102,9 @@ private MapView navMapView;
         });
 
         //basemap show implementation
-        FloatingActionButton basemapActionButton = (FloatingActionButton)findViewById(R.id.base_map);
-        basemapActionButton.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton recyclerActionButtion = (FloatingActionButton)findViewById(R.id.base_map);
+        recyclerActionButtion.setVisibility(View.GONE);
+        recyclerActionButtion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

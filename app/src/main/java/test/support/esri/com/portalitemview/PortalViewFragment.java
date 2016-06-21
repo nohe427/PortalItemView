@@ -21,7 +21,7 @@ import android.widget.TextView;
 
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
 import com.esri.arcgisruntime.loadable.LoadStatus;
-import com.esri.arcgisruntime.mapping.Map;
+import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.portal.Portal;
 import com.esri.arcgisruntime.portal.PortalItem;
 import com.esri.arcgisruntime.portal.PortalItemType;
@@ -151,7 +151,8 @@ public class PortalViewFragment extends Fragment {
                 return null;
             }
 
-            portal = new Portal("http://www.arcgis.com", new UserCredential(username, password));
+            portal = new Portal("http://www.arcgis.com");
+            portal.setCredential(new UserCredential(username, password));
             portal.loadAsync();
             portal.addDoneLoadingListener(new Runnable() {
                 @Override
@@ -206,7 +207,7 @@ public class PortalViewFragment extends Fragment {
                                 if (data != null) {
                                     Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                                     if(portalItem.getType() == PortalItemType.WEBMAP)
-                                    mCardViewData.add(new CardViewData(portalItem, bitmap, new Map(portalItem)));
+                                    mCardViewData.add(new CardViewData(portalItem, bitmap, new ArcGISMap(portalItem)));
 
                                 }
                             }
@@ -227,7 +228,7 @@ public class PortalViewFragment extends Fragment {
                         }else{
                             if(portal.getLoadStatus() == LoadStatus.FAILED_TO_LOAD){
                                 Snackbar.make(getActivity().findViewById(R.id.nav_view), "The provided credentials not valid for "+
-                                portal.getUrl(), Snackbar.LENGTH_LONG).show();
+                                portal.getUri(), Snackbar.LENGTH_LONG).show();
                             }
                 }
             } catch (ExecutionException | InterruptedException exception) {

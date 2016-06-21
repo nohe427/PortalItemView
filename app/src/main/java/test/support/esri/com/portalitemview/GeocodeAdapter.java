@@ -36,7 +36,7 @@ public class GeocodeAdapter extends RecyclerView.Adapter<GeocodeAdapter.ViewHold
                 Point point = dataGeocoded.getLocationPoint().get(position);
                 Intent intent = new Intent(v.getContext(), PortalViewMain.class);
                 double[] coordinates = {point.getX(), point.getY(),
-                        new Integer(point.getSpatialReference().getWKID()).doubleValue()};
+                        new Integer(point.getSpatialReference().getWkid()).doubleValue()};
                 intent.putExtra("point", coordinates);
                     v.getContext().startActivity(intent);
                 /*mapView.setMap(new Map(Basemap.createLightGrayCanvas()));

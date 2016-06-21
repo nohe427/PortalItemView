@@ -11,7 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.esri.arcgisruntime.loadable.LoadStatus;
-import com.esri.arcgisruntime.mapping.Map;
+import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.portal.PortalItemType;
 
@@ -70,7 +70,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.ViewHo
             @Override
             public void onClick(final View v) {
                 if (portalDataset.get(position).getPortalItem().getType() == PortalItemType.WEBMAP) {
-                    final Map portalMap = new Map(portalDataset.get(position).getPortalItem());
+                    final ArcGISMap portalMap = new ArcGISMap(portalDataset.get(position).getPortalItem());
                     portalMap.loadAsync();
                     portalMap.addDoneLoadingListener(new Runnable() {
                         @Override
