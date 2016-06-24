@@ -38,13 +38,15 @@ import com.esri.arcgisruntime.security.UserCredential;
 public class PortalViewMain extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LogInFragment.OnFragmentInteractionListener, PortalViewFragment.OnFragmentInteractionListener,
 BasemapFragment.OnFragmentInteractionListener{
-private MapView navMapView;
-    private ArcGISMap navigationMap;
+    private MapView navMapView;
+    public static ArcGISMap navigationMap;
     private NavigationView navigationView;
     private Portal portal;
     private FragmentTransaction fragmentTransaction;
     private FragmentManager fragmentManager;
     private  String menuTitle;
+    static FloatingActionButton recyclerActionButtion;
+    public static Menu globalMenu;
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -74,7 +76,8 @@ private MapView navMapView;
                navigationView.getMenu().getItem(i).setEnabled(false);
             }
            if(menuTitle.equalsIgnoreCase("ArcGIS Community")){
-               portal = new Portal("https://www.arcgis.com");//"http://www.arcgis.com", new UserCredential(USERNAME, PASSWORD));
+               portal = new Portal("https://www.arcgis.com");
+
                if(portal.getLoadStatus() != LoadStatus.LOADED){
                for(int c=0; c < navigationView.getMenu().getItem(i).getSubMenu().size(); c++) {
                        navigationView.getMenu().getItem(i).getSubMenu().getItem(c).setEnabled(false);
@@ -102,19 +105,24 @@ private MapView navMapView;
         });
 
         //basemap show implementation
-        FloatingActionButton recyclerActionButtion = (FloatingActionButton)findViewById(R.id.base_map);
+        recyclerActionButtion = (FloatingActionButton)findViewById(R.id.base_map);
         recyclerActionButtion.setVisibility(View.GONE);
+        final FragmentManager manager = getSupportFragmentManager();
         recyclerActionButtion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                BasemapFragment basemapFragment = new BasemapFragment();
-                transaction.add(R.id.nav_map_view, basemapFragment, "basemap fragment").commit();
+                if(manager.popBackStackImmediate("recycler_transaction", FragmentManager.POP_BACK_STACK_INCLUSIVE)){
+                performArcGISOnlineQuery();
+                }
             }
         });
 
+            performArcGISOnlineQuery();
+    }
 
 
+
+    public void performArcGISOnlineQuery(){
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         PortalViewFragment portalViewFragment = new PortalViewFragment();
@@ -122,7 +130,9 @@ private MapView navMapView;
         argBundle.putString("USERNAME",getIntent().getStringExtra("USERNAME"));
         argBundle.putString("PASSWORD", getIntent().getStringExtra("PASSWORD"));
         portalViewFragment.setArguments(argBundle);
-        fragmentTransaction.add(R.id.nav_map_view, portalViewFragment, "recycler_view_fragment").commit();
+        fragmentTransaction.add(R.id.nav_map_view, portalViewFragment, "recycler_view_fragment")
+                .addToBackStack("recycler_transaction")
+                .commit();
 
         //if the activity is started by the geocode activity
         double[] doubleArray = getIntent().getDoubleArrayExtra("point");
@@ -132,8 +142,6 @@ private MapView navMapView;
             navMapView.setViewpointCenterWithScaleAsync(point, 100);
         }
     }
-
-
 
     @Override
     protected void onResume(){
@@ -173,26 +181,56 @@ private MapView navMapView;
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         //super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.navigator, menu);
+        globalMenu = menu;
+        getMenuInflater().inflate(R.menu.navigator, globalMenu);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView)menu.findItem(R.id.searchable).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconified(false);
         searchView.setSubmitButtonEnabled(true);
+        //check for the visibility on the basemap floating button and perform logic
 
         return true;
     }
+
+
+    private void showMessage(String message){
+        Toast.makeText(getApplicationContext(),message , Toast.LENGTH_LONG).show();
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.portal_button) {
+          if(item.getTitle().toString().equalsIgnoreCase("Show Portal Button")){
+                recyclerActionButtion.show();
+                globalMenu.findItem(R.id.portal_button).setTitle("Hide Portal Button");
+            }
+           else if(item.getTitle().toString().equalsIgnoreCase("Hide Portal Button")){
+                recyclerActionButtion.hide();
+                globalMenu.findItem(R.id.portal_button).setTitle("Show Portal Button");
+            }
+
+        }else if(id == R.id.base_map_changer){
+            if(globalMenu.findItem(R.id.base_map_changer).getTitle().toString().equalsIgnoreCase("Change Basemap")){
+                getSupportFragmentManager().beginTransaction().add(R.id.nav_map_view, new BasemapFragment(), "BasemapFrag").commit();
+                globalMenu.findItem(R.id.base_map_changer).setTitle("Hide Basemap Selector");
+            }else if(globalMenu.findItem(R.id.base_map_changer).getTitle().toString().equalsIgnoreCase("Hide Basemap Selector")){
+                getSupportFragmentManager().beginTransaction().remove(
+                        getSupportFragmentManager().findFragmentByTag("BasemapFrag")
+                ).commit();
+                globalMenu.findItem(R.id.base_map_changer).setTitle("Change Basemap");
+            }
+
+        }else if(id == R.id.layers){
+
         }
 
         return super.onOptionsItemSelected(item);

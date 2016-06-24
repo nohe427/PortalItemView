@@ -81,7 +81,9 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.ViewHo
                                 MapView realMapView = (MapView) fragmentManager.findFragmentByTag("recycler_view_fragment").getActivity()
                                         .findViewById(R.id.nav_map_view);
                                 realMapView.setMap(portalMap);
-                                Toast.makeText(v.getContext(), "Loaded", Toast.LENGTH_SHORT).show();
+                                PortalViewMain.recyclerActionButtion.setVisibility(View.VISIBLE);
+                                Toast.makeText(v.getContext(), "Loaded portal item "+portalDataset.get(position)
+                                        .getPortalItemName(), Toast.LENGTH_SHORT).show();
                             } else if (portalMap.getLoadStatus() == LoadStatus.FAILED_TO_LOAD) {
                                 Snackbar.make(v, "Yo man the map did not load because \n" +
                                                 " " + portalMap.getLoadError().getMessage(),

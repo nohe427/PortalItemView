@@ -1,21 +1,129 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
-    tools:context="test.support.esri.com.portalitemview.BasemapFragment">
+    android:layout_width="match_parent">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+<GridLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:rowCount="10"
+    android:columnCount="9"
+    android:orientation="vertical"
+    android:padding="16sp"
+    tools:context="test.support.esri.com.portalitemview.BasemapFragment"
+    android:outlineProvider="paddedBounds"
+    android:useDefaultMargins="true">
+    <ImageView
+        android:id="@+id/delorme"
+        android:layout_row="0"
+        android:layout_column="0"
+        android:layout_height="100dp"
+        android:layout_width="150dp"
+        android:src="@mipmap/delorme"
+        android:contentDescription="delorme basemap" />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/base_map_recycler"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/imagery"
+        android:layout_row="0"
+        android:layout_column="1"
+        android:layout_height="100dp"
+        android:layout_width="150dp"
+        android:src="@mipmap/imagery"
+        android:contentDescription="imagery basemap" />
 
-        </android.support.v7.widget.RecyclerView>
+    <ImageView
+        android:id="@+id/natgeo"
+        android:layout_row="1"
+        android:layout_column="0"
+        android:layout_height="100dp"
+        android:layout_width="150dp"
+        android:src="@mipmap/natgeo"
+        android:contentDescription="natgeo basemap" />
+    <ImageView
+        android:id="@+id/ocean"
+        android:layout_row="1"
+        android:layout_column="1"
+        android:layout_height="100dp"
+        android:layout_width="150dp"
+        android:src="@mipmap/ocean"
+        android:contentDescription="ocean basemap" />
 
-    </RelativeLayout>
+    <ImageView
+        android:id="@+id/physical"
+        android:layout_row="2"
+        android:layout_column="0"
+        android:layout_height="100dp"
+        android:layout_width="150dp"
+        android:src="@mipmap/physical"
+        android:contentDescription="physical basemap" />
 
-</LinearLayout>
+    <ImageView
+        android:id="@+id/relief"
+        android:layout_row="2"
+        android:layout_column="1"
+        android:layout_height="100dp"
+        android:layout_width="150dp"
+        android:src="@mipmap/relief"
+        android:contentDescription="relief basemap" />
+
+    <ImageView
+        android:id="@+id/street"
+        android:layout_row="3"
+        android:layout_column="0"
+        android:layout_height="100dp"
+        android:layout_width="150dp"
+        android:src="@mipmap/street"
+        android:contentDescription="street basemap" />
+
+    <ImageView
+        android:id="@+id/transportation"
+        android:layout_row="3"
+        android:layout_column="1"
+        android:layout_height="100dp"
+        android:layout_width="150dp"
+        android:src="@mipmap/transportation"
+        android:contentDescription="transportation basemap" />
+    <ImageView
+        android:id="@+id/ustopo"
+        android:layout_row="4"
+        android:layout_column="0"
+        android:layout_height="100dp"
+        android:layout_width="150dp"
+        android:src="@mipmap/ustopo"
+        android:contentDescription="ustopo basemap" />
+    <ImageView
+        android:id="@+id/world_business"
+        android:layout_row="4"
+        android:layout_column="1"
+        android:layout_height="100dp"
+        android:layout_width="150dp"
+        android:src="@mipmap/worldbusiness"
+        android:contentDescription="world business basemap" />
+
+    <ImageView
+        android:id="@+id/world_dark"
+        android:layout_row="5"
+        android:layout_column="0"
+        android:layout_height="100dp"
+        android:layout_width="150dp"
+        android:src="@mipmap/worlddark"
+        android:contentDescription="world dark basemap" />
+    <ImageView
+        android:id="@+id/world_gray"
+        android:layout_row="5"
+        android:layout_column="1"
+        android:layout_height="100dp"
+        android:layout_width="150dp"
+        android:src="@mipmap/worldgray"
+        android:contentDescription="world_gray basemap" />
+
+    <Button
+        android:layout_width="32dp"
+        android:layout_height="wrap_content"
+        android:text="x"
+        android:id="@+id/close_button"
+        android:layout_row="0"
+        android:layout_column="8" />
+
+</GridLayout>
+</ScrollView>

@@ -7,4 +7,23 @@
         app:showAsAction="collapseActionView|ifRoom"
         android:icon="@drawable/places_ic_search"
         app:actionViewClass="android.widget.SearchView"/>
+    <item
+        android:id="@+id/base_map_changer"
+        android:title="@string/base_map"
+        app:showAsAction="collapseActionView|never"
+        android:icon="@drawable/ic_map_black_24dp"
+        />
+
+    <item
+        android:id="@+id/portal_button"
+        android:title="@string/show_portal"
+        app:showAsAction="collapseActionView|never"
+        android:icon="@drawable/portal"
+        />
+    <item
+        android:id="@+id/layers"
+        android:title="@string/layers"
+        app:showAsAction="never"
+        android:icon="@drawable/ic_layers_black_24dp"
+        />
 </menu>

@@ -5,15 +5,16 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
+import com.esri.arcgisruntime.layers.ArcGISTiledLayer;
 import com.esri.arcgisruntime.mapping.Basemap;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 
 /**
@@ -66,18 +67,216 @@ public class BasemapFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        new BasemapAsyncTask().execute();
+       // new BasemapAsyncTask().execute();
 
     }
 
+
+    @Override
+    public void onHiddenChanged(boolean hidden){
+        if(hidden){
+           PortalViewMain.globalMenu.findItem(R.id.base_map_changer).setTitle("Change Basemap");
+        }
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         base_map_view = inflater.inflate(R.layout.fragment_basemap, container, false);
 
+        //remove the fragment on close button click
+        Button closeButton  = (Button)base_map_view.findViewById(R.id.close_button);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().getSupportFragmentManager().beginTransaction().hide(
+                        getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
+                ).commit();
+            }
+        });
+
+        //implement business logic to display the map
+        base_map_view.findViewById(R.id.delorme).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+              changeBasemap("delorme");
+            }
+        });
+        base_map_view.findViewById(R.id.imagery).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeBasemap("imagery");
+            }
+        });
+        base_map_view.findViewById(R.id.natgeo).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeBasemap("natgeo");
+            }
+        });
+        base_map_view.findViewById(R.id.ocean).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeBasemap("ocean");
+            }
+        });
+        base_map_view.findViewById(R.id.physical).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeBasemap("physical");
+            }
+        });
+        base_map_view.findViewById(R.id.relief).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeBasemap("relief");
+            }
+        });
+        base_map_view.findViewById(R.id.street).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeBasemap("street");
+            }
+        });
+        base_map_view.findViewById(R.id.transportation).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeBasemap("transportation");
+            }
+        });
+        base_map_view.findViewById(R.id.ustopo).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeBasemap("ustopo");
+            }
+        });
+        base_map_view.findViewById(R.id.world_business).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeBasemap("world_business");
+            }
+        });
+        base_map_view.findViewById(R.id.world_dark).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeBasemap("world_dark");
+            }
+        });
+        base_map_view.findViewById(R.id.world_gray).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeBasemap("world_gray");
+            }
+        });
         return base_map_view;
     }
+
+    private String changeBasemap(String mapID){
+        BasemapAdapter basemapAdapter = new BasemapAdapter();
+        Map<String, String> testData = basemapAdapter.getBasemaps();
+        String basemap_url = null;
+        switch (mapID){
+            case "delorme":
+                basemap_url = testData.get(mapID);
+                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                        new ArcGISTiledLayer(basemap_url)));
+                getActivity().getSupportFragmentManager().beginTransaction().hide(
+                        getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
+                ).commit();
+                break;
+            case "imagery":
+                basemap_url = testData.get(mapID);
+                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                        new ArcGISTiledLayer(basemap_url)));
+                getActivity().getSupportFragmentManager().beginTransaction().hide(
+                        getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
+                ).commit();
+                break;
+            case "natgeo":
+                basemap_url = testData.get(mapID);
+                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                        new ArcGISTiledLayer(basemap_url)));
+                getActivity().getSupportFragmentManager().beginTransaction().hide(
+                        getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
+                ).commit();
+                break;
+            case "ocean":
+                basemap_url = testData.get(mapID);
+                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                        new ArcGISTiledLayer(basemap_url)));
+                getActivity().getSupportFragmentManager().beginTransaction().hide(
+                        getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
+                ).commit();
+                break;
+            case "physical":
+                basemap_url = testData.get(mapID);
+                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                        new ArcGISTiledLayer(basemap_url)));
+                getActivity().getSupportFragmentManager().beginTransaction().hide(
+                        getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
+                ).commit();
+                break;
+            case "relief":
+                basemap_url = testData.get(mapID);
+                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                        new ArcGISTiledLayer(basemap_url)));
+                getActivity().getSupportFragmentManager().beginTransaction().hide(
+                        getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
+                ).commit();
+                break;
+            case "street":
+                basemap_url = testData.get(mapID);
+                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                        new ArcGISTiledLayer(basemap_url)));
+                getActivity().getSupportFragmentManager().beginTransaction().hide(
+                        getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
+                ).commit();
+                break;
+            case "transportation":
+                basemap_url = testData.get(mapID);
+                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                        new ArcGISTiledLayer(basemap_url)));
+                getActivity().getSupportFragmentManager().beginTransaction().hide(
+                        getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
+                ).commit();
+                break;
+            case "ustopo":
+                basemap_url = testData.get(mapID);
+                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                        new ArcGISTiledLayer(basemap_url)));
+                getActivity().getSupportFragmentManager().beginTransaction().hide(
+                        getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
+                ).commit();
+                break;
+            case "world_business":
+                basemap_url = testData.get(mapID);
+                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                        new ArcGISTiledLayer(basemap_url)));
+                getActivity().getSupportFragmentManager().beginTransaction().hide(
+                        getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
+                ).commit();
+                break;
+            case "world_dark":
+                basemap_url = testData.get(mapID);
+                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                        new ArcGISTiledLayer(basemap_url)));
+                getActivity().getSupportFragmentManager().beginTransaction().hide(
+                        getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
+                ).commit();
+                break;
+            case "world_gray":
+                basemap_url = testData.get(mapID);
+                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                        new ArcGISTiledLayer(basemap_url)));
+                getActivity().getSupportFragmentManager().beginTransaction().hide(
+                        getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
+                ).commit();
+                break;
+        }
+
+        return basemap_url;
+    }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -128,7 +327,7 @@ public class BasemapFragment extends Fragment {
             baseLayers.add(0, Basemap.createImagery());
             baseLayers.add(1, Basemap.createLightGrayCanvas());
             baseLayers.add(2, Basemap.createStreets());
-            getActivity().runOnUiThread(new Runnable() {
+           /* getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     BasemapAdapter basemapAdapter = new BasemapAdapter(baseLayers);
@@ -137,7 +336,7 @@ public class BasemapFragment extends Fragment {
                     recyclerView.setLayoutManager(linearLayoutManager);
                     recyclerView.setAdapter(basemapAdapter);
                 }
-            });
+            });*/
             return null;
         }
     }
