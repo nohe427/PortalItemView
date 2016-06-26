@@ -331,7 +331,7 @@ public class BasemapFragment extends Fragment {
                 @Override
                 public void run() {
                     BasemapAdapter basemapAdapter = new BasemapAdapter(baseLayers);
-                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
                     RecyclerView recyclerView = (RecyclerView) base_map_view.findViewById(R.id.base_map_recycler);
                     recyclerView.setLayoutManager(linearLayoutManager);
                     recyclerView.setAdapter(basemapAdapter);

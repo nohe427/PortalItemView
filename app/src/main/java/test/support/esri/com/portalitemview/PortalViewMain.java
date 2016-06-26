@@ -262,20 +262,12 @@ BasemapFragment.OnFragmentInteractionListener, ControlsFragment.OnFragmentIntera
             }
 
         }else if(id == R.id.show_layers_option) {
-           // try {
                 LayerList layerList = navigationMap.getOperationalLayers();
                 String layerName;
                 ArrayList<String> listOfLayerNames = new ArrayList<>();
-                ShowLayersAdapter showLayersAdapter = new ShowLayersAdapter(listOfLayerNames);
                 for (int i = 0; i < layerList.size(); i++) {
                     layerName = layerList.get(i).getName();
-                    listOfLayerNames.add(layerName);
-                    Log.d("LayerShowDebug", Integer.toString(showLayersAdapter.getItemCount()));
-                    /*if (layer instanceof FeatureLayer) {
-                        featureLayer = (FeatureLayer) layer;
-                        listOfLegends = featureLayer.fetchLegendInfosAsync().get();
-                        showLayersAdapter = new ShowLayersAdapter(listOfLegends);
-                    }*/
+                    listOfLayerNames.add(i, layerName);
                 }
             Bundle showFragBundle = new Bundle();
             showFragBundle.putStringArrayList("layersArrayList", listOfLayerNames);
@@ -283,10 +275,6 @@ BasemapFragment.OnFragmentInteractionListener, ControlsFragment.OnFragmentIntera
             showLayersFragment.setArguments(showFragBundle);
             getSupportFragmentManager().beginTransaction().add(R.id.nav_map_view, showLayersFragment, "Show_Layers_Frag")
                     .commit();
-
-          //  }catch(InterruptedException|ExecutionException ieException){
-
-           // }
         }
 
         return super.onOptionsItemSelected(item);

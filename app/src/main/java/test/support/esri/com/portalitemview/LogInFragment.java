@@ -85,7 +85,7 @@ public class LogInFragment extends Fragment {
     private void loginToPortal() {
         //check for empty content
 
-        if(radio_arcgis.isChecked() || radio_portal.isChecked() && txtPortalURL.getText().toString().length() == 0){
+        if(radio_portal.isChecked() && txtPortalURL.getText().toString().length() == 0){
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
