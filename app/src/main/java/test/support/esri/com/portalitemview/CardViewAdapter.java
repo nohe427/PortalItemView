@@ -3,6 +3,7 @@ package test.support.esri.com.portalitemview;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.esri.arcgisruntime.layers.ArcGISVectorTiledLayer;
 import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.view.MapView;
@@ -76,12 +78,12 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.ViewHo
                         @Override
                         public void run() {
                             if (portalMap.getLoadStatus() == LoadStatus.LOADED) {
-                                fragmentManager.beginTransaction().detach(fragmentManager.findFragmentByTag("recycler_view_fragment"))
+                                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("recycler_view_fragment"))
                                         .commit();
                                 MapView realMapView = (MapView) fragmentManager.findFragmentByTag("recycler_view_fragment").getActivity()
                                         .findViewById(R.id.nav_map_view);
                                 realMapView.setMap(portalMap);
-                                PortalViewMain.recyclerActionButtion.setVisibility(View.VISIBLE);
+
                                 Toast.makeText(v.getContext(), "Loaded portal item "+portalDataset.get(position)
                                         .getPortalItemName(), Toast.LENGTH_SHORT).show();
                             } else if (portalMap.getLoadStatus() == LoadStatus.FAILED_TO_LOAD) {
@@ -93,6 +95,22 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.ViewHo
                     });
 
                 }
+
+                //trying to demonstrated a reported issue on early adopter
+                final ArcGISVectorTiledLayer vectorTiledLayer = new ArcGISVectorTiledLayer(portalDataset.get(position)
+                .getPortalItem());
+                vectorTiledLayer.loadAsync();
+                vectorTiledLayer.addDoneLoadingListener(new Runnable() {
+                    @Override
+                    public void run() {
+                        fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("recycler_view_fragment"))
+                                .commit();
+                        MapView realMapView = (MapView) fragmentManager.findFragmentByTag("recycler_view_fragment").getActivity()
+                                .findViewById(R.id.nav_map_view);
+                        realMapView.getMap().getOperationalLayers().add(vectorTiledLayer);
+                       Log.d("KwasiIDTest", realMapView.getMap().getOperationalLayers().get(0).getName());
+                    }
+                });
             }
         });
 

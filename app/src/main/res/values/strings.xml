@@ -40,6 +40,6 @@
     <string name="search_icon">search places</string>
     <string name="search_hint">Search for places</string>
     <string name="base_map">Change Basemap</string>
-    <string name="show_portal">Show Portal Button</string>
+    <string name="show_portal">Show Action Buttons</string>
     <string name="layers">Show Layers</string>
 </resources>

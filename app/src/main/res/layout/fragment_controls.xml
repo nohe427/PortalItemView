@@ -1,13 +1,53 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="test.support.esri.com.portalitemview.ControlsFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/show_layers"
+        android:src="@drawable/ic_layers_black_24dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        app:useCompatPadding="true"
+        app:fabSize="mini"
+        app:backgroundTintMode="src_atop"
+        app:backgroundTint="@android:color/transparent" />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/add_data"
+        android:src="@drawable/add_data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:useCompatPadding="true"
+        app:fabSize="mini"
+        app:backgroundTintMode="src_atop"
+        app:backgroundTint="@android:color/transparent"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/show_layers" />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/edit_data"
+        android:src="@drawable/edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:useCompatPadding="true"
+        app:fabSize="mini"
+        app:backgroundTintMode="src_atop"
+        app:backgroundTint="@android:color/transparent"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/add_data" />
 
-</FrameLayout>
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:text="x"
+        android:id="@+id/float_close_button"
+        android:layout_above="@+id/edit_data"
+        android:layout_toStartOf="@+id/edit_data"
+        android:textSize="8dp" />
+
+</RelativeLayout>

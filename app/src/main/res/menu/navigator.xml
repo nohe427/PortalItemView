@@ -21,7 +21,7 @@
         android:icon="@drawable/portal"
         />
     <item
-        android:id="@+id/layers"
+        android:id="@+id/show_layers_option"
         android:title="@string/layers"
         app:showAsAction="never"
         android:icon="@drawable/ic_layers_black_24dp"

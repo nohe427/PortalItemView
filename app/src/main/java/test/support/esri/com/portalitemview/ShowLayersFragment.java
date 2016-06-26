@@ -3,24 +3,25 @@ package test.support.esri.com.portalitemview;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Toast;
+
+import java.util.ArrayList;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ControlsFragment.OnFragmentInteractionListener} interface
+ * {@link ShowLayersFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link ControlsFragment#newInstance} factory method to
+ * Use the {@link ShowLayersFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ControlsFragment extends Fragment {
+public class ShowLayersFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -31,9 +32,11 @@ public class ControlsFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-    private View controlsView;
+    private View showLayersView;
+    private RecyclerView recyclerView;
+    private ArrayList<String> showLayersArrayList;
 
-    public ControlsFragment() {
+    public ShowLayersFragment() {
         // Required empty public constructor
     }
 
@@ -43,11 +46,11 @@ public class ControlsFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment ControlsFragment.
+     * @return A new instance of fragment ShowLayersFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ControlsFragment newInstance(String param1, String param2) {
-        ControlsFragment fragment = new ControlsFragment();
+    public static ShowLayersFragment newInstance(String param1, String param2) {
+        ShowLayersFragment fragment = new ShowLayersFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -61,59 +64,29 @@ public class ControlsFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+
+       showLayersArrayList = getArguments().getStringArrayList("layersArrayList");
+
         }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                                     Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        controlsView = inflater.inflate(R.layout.fragment_controls, container, false);
-
-        //Close action buttons view
-        Button closeFloatButton = (Button)controlsView.findViewById(R.id.float_close_button);
-        closeFloatButton.setOnClickListener(new View.OnClickListener() {
+        showLayersView = inflater.inflate(R.layout.fragment_show_layers, container, false);
+        getActivity().runOnUiThread(new Runnable() {
             @Override
-            public void onClick(View v) {
-                getActivity().getSupportFragmentManager().beginTransaction().hide(
-                        getFragmentManager().findFragmentByTag("ControlsFrag")
-                ).commit();
+            public void run() {
+                RecyclerView recyclerView = (RecyclerView)showLayersView.findViewById(R.id.show_layers_recycler);
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+                ShowLayersAdapter showLayersAdapter = new ShowLayersAdapter(showLayersArrayList);
+                recyclerView.setLayoutManager(linearLayoutManager);
+                recyclerView.setAdapter(showLayersAdapter);
             }
         });
-
-        //logic for edit button
-        FloatingActionButton editFloatingButton = (FloatingActionButton)controlsView.findViewById(R.id.edit_data);
-        editFloatingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "action not implemented", Toast.LENGTH_LONG).show();
-            }
-        });
-        //logic for add data button
-        FloatingActionButton addDataButton = (FloatingActionButton)controlsView.findViewById(R.id.add_data);
-        addDataButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "action not implemented", Toast.LENGTH_LONG).show();
-            }
-        });
-        //logic for show layer button
-        FloatingActionButton showLayerButton = (FloatingActionButton)controlsView.findViewById(R.id.show_layers);
-        showLayerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              if(getActivity().getSupportFragmentManager().findFragmentByTag("recycler_view_fragment").isHidden()){
-                  getActivity().getSupportFragmentManager().beginTransaction().show(
-                          getActivity().getSupportFragmentManager().findFragmentByTag("recycler_view_fragment")
-                  ).commit();
-              }else{
-                  getActivity().getSupportFragmentManager().beginTransaction().hide(
-                          getActivity().getSupportFragmentManager().findFragmentByTag("recycler_view_fragment")
-                  ).commit();
-              }
-            }
-        });
-        return controlsView;
+        return showLayersView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -124,12 +97,6 @@ public class ControlsFragment extends Fragment {
     }
 
     @Override
-    public void onHiddenChanged(boolean hidden){
-        if(hidden){
-            PortalViewMain.globalMenu.findItem(R.id.portal_button).setTitle("Show Action Buttons");
-        }
-    }
-    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
@@ -138,8 +105,6 @@ public class ControlsFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-
-
     }
 
     @Override

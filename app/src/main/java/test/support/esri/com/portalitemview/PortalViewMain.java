@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,10 +19,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.esri.arcgisruntime.geometry.Point;
@@ -29,15 +33,20 @@ import com.esri.arcgisruntime.geometry.SpatialReference;
 import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.Basemap;
+import com.esri.arcgisruntime.mapping.LayerList;
+import com.esri.arcgisruntime.mapping.view.Callout;
+import com.esri.arcgisruntime.mapping.view.DefaultMapViewOnTouchListener;
 import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.portal.Portal;
 import com.esri.arcgisruntime.security.UserCredential;
 
+import java.util.ArrayList;
+
 
 public class PortalViewMain extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LogInFragment.OnFragmentInteractionListener, PortalViewFragment.OnFragmentInteractionListener,
-BasemapFragment.OnFragmentInteractionListener{
+BasemapFragment.OnFragmentInteractionListener, ControlsFragment.OnFragmentInteractionListener, ShowLayersFragment.OnFragmentInteractionListener{
     private MapView navMapView;
     public static ArcGISMap navigationMap;
     private NavigationView navigationView;
@@ -45,8 +54,9 @@ BasemapFragment.OnFragmentInteractionListener{
     private FragmentTransaction fragmentTransaction;
     private FragmentManager fragmentManager;
     private  String menuTitle;
-    static FloatingActionButton recyclerActionButtion;
     public static Menu globalMenu;
+    private android.graphics.Point whereClicked;
+    private Callout callout;
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -60,6 +70,23 @@ BasemapFragment.OnFragmentInteractionListener{
         navMapView.setMap(navigationMap);
         navMapView.setMagnifierEnabled(true);
         navMapView.setCanMagnifierPanMap(true);
+
+
+        //implement logic for callout
+         callout = navMapView.getCallout();
+        TextView textView = new TextView(getApplicationContext());
+        textView.setText("Testing callout");
+        callout.setContent(textView);
+        Callout.ShowOptions showOptions = new Callout.ShowOptions();
+        showOptions.setAnimateCallout(true);
+        showOptions.setRecenterMap(true);
+        Callout.Style style = new Callout.Style(getApplicationContext());
+        style.setBackgroundColor(Color.DKGRAY);
+        callout.setShowOptions(showOptions);
+        callout.setStyle(style);
+
+        MapViewSingleClick singleClick = new MapViewSingleClick(getApplicationContext(), navMapView);
+        navMapView.setOnTouchListener(singleClick);
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -103,24 +130,27 @@ BasemapFragment.OnFragmentInteractionListener{
         }
             }
         });
-
-        //basemap show implementation
-        recyclerActionButtion = (FloatingActionButton)findViewById(R.id.base_map);
-        recyclerActionButtion.setVisibility(View.GONE);
-        final FragmentManager manager = getSupportFragmentManager();
-        recyclerActionButtion.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(manager.popBackStackImmediate("recycler_transaction", FragmentManager.POP_BACK_STACK_INCLUSIVE)){
-                performArcGISOnlineQuery();
-                }
-            }
-        });
-
             performArcGISOnlineQuery();
     }
 
 
+
+    //inner class for extending single tap
+    private class MapViewSingleClick extends DefaultMapViewOnTouchListener{
+
+        public MapViewSingleClick(Context context, MapView mapView) {
+            super(context, mapView);
+        }
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e){
+            whereClicked = new android.graphics.Point(Math.round(e.getX()), Math.round(e.getY()));
+            Point calloutPoint = navMapView.screenToLocation(whereClicked);
+            callout.setLocation(calloutPoint);
+            callout.show();
+            return true;
+        }
+    }
 
     public void performArcGISOnlineQuery(){
 
@@ -209,13 +239,15 @@ BasemapFragment.OnFragmentInteractionListener{
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.portal_button) {
-          if(item.getTitle().toString().equalsIgnoreCase("Show Portal Button")){
-                recyclerActionButtion.show();
-                globalMenu.findItem(R.id.portal_button).setTitle("Hide Portal Button");
+          if(item.getTitle().toString().equalsIgnoreCase("Show Action Buttons")){
+              ControlsFragment controlsFragment = new ControlsFragment();
+                getSupportFragmentManager().beginTransaction().add(R.id.nav_map_view, controlsFragment , "ControlsFrag").commit();
+
+                globalMenu.findItem(R.id.portal_button).setTitle("Hide Action Buttons");
             }
-           else if(item.getTitle().toString().equalsIgnoreCase("Hide Portal Button")){
-                recyclerActionButtion.hide();
-                globalMenu.findItem(R.id.portal_button).setTitle("Show Portal Button");
+           else if(item.getTitle().toString().equalsIgnoreCase("Hide Action Buttons")){
+              getSupportFragmentManager().beginTransaction().hide(getSupportFragmentManager().findFragmentByTag("ControlsFrag")).commit();
+                globalMenu.findItem(R.id.portal_button).setTitle("Show Action Buttons");
             }
 
         }else if(id == R.id.base_map_changer){
@@ -229,8 +261,32 @@ BasemapFragment.OnFragmentInteractionListener{
                 globalMenu.findItem(R.id.base_map_changer).setTitle("Change Basemap");
             }
 
-        }else if(id == R.id.layers){
+        }else if(id == R.id.show_layers_option) {
+           // try {
+                LayerList layerList = navigationMap.getOperationalLayers();
+                String layerName;
+                ArrayList<String> listOfLayerNames = new ArrayList<>();
+                ShowLayersAdapter showLayersAdapter = new ShowLayersAdapter(listOfLayerNames);
+                for (int i = 0; i < layerList.size(); i++) {
+                    layerName = layerList.get(i).getName();
+                    listOfLayerNames.add(layerName);
+                    Log.d("LayerShowDebug", Integer.toString(showLayersAdapter.getItemCount()));
+                    /*if (layer instanceof FeatureLayer) {
+                        featureLayer = (FeatureLayer) layer;
+                        listOfLegends = featureLayer.fetchLegendInfosAsync().get();
+                        showLayersAdapter = new ShowLayersAdapter(listOfLegends);
+                    }*/
+                }
+            Bundle showFragBundle = new Bundle();
+            showFragBundle.putStringArrayList("layersArrayList", listOfLayerNames);
+            ShowLayersFragment showLayersFragment = new ShowLayersFragment();
+            showLayersFragment.setArguments(showFragBundle);
+            getSupportFragmentManager().beginTransaction().add(R.id.nav_map_view, showLayersFragment, "Show_Layers_Frag")
+                    .commit();
 
+          //  }catch(InterruptedException|ExecutionException ieException){
+
+           // }
         }
 
         return super.onOptionsItemSelected(item);
