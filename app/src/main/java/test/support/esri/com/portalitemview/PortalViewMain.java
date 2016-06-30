@@ -48,7 +48,9 @@ import java.util.ArrayList;
 
 public class PortalViewMain extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LogInFragment.OnFragmentInteractionListener, PortalViewFragment.OnFragmentInteractionListener,
-BasemapFragment.OnFragmentInteractionListener, ControlsFragment.OnFragmentInteractionListener, ShowLayersFragment.OnFragmentInteractionListener{
+BasemapFragment.OnFragmentInteractionListener, ControlsFragment.OnFragmentInteractionListener, ShowLayersFragment.OnFragmentInteractionListener,
+RoutingFragment.OnFragmentInteractionListener{
+
     private static MapView navMapView;
     public ArcGISMap navigationMap;
     private NavigationView navigationView;
@@ -130,6 +132,12 @@ BasemapFragment.OnFragmentInteractionListener, ControlsFragment.OnFragmentIntera
         locationDisplay.startAsync();
         }else{
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                    if(ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+                            PackageManager.PERMISSION_GRANTED){
+                        LocationDisplay locationDisplay = navMapView.getLocationDisplay();
+                        locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.NAVIGATION);
+                        locationDisplay.startAsync();
+                    }
         }
             }
         });
@@ -216,13 +224,14 @@ BasemapFragment.OnFragmentInteractionListener, ControlsFragment.OnFragmentIntera
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        //super.onCreateOptionsMenu(menu);
+        super.onCreateOptionsMenu(menu);
         globalMenu = menu;
         getMenuInflater().inflate(R.menu.navigator, globalMenu);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView)menu.findItem(R.id.searchable).getActionView();
+
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setIconified(false);
+        searchView.setIconifiedByDefault(true);
         searchView.setSubmitButtonEnabled(true);
         //check for the visibility on the basemap floating button and perform logic
 
@@ -298,7 +307,7 @@ BasemapFragment.OnFragmentInteractionListener, ControlsFragment.OnFragmentIntera
 
         if (id==R.id.nav_login) {
             // Handle the log in action
-            if(item.getTitle().toString().equalsIgnoreCase("Log in to a Portal")){
+            if(item.getTitle().toString().equalsIgnoreCase("Log in to Portal")){
                     fragmentManager = getSupportFragmentManager();
                     fragmentTransaction = fragmentManager.beginTransaction();
                     LogInFragment logInFragment = new LogInFragment();
@@ -315,11 +324,14 @@ BasemapFragment.OnFragmentInteractionListener, ControlsFragment.OnFragmentIntera
         } else if (id == R.id.nav_3d) {
 
         } else if (id == R.id.nav_address) {
-        searchView.setFocusable(true);
+            searchView.setIconified(false);
+            globalMenu.findItem(R.id.searchable).expandActionView();
         } else if (id== R.id.nav_share) {
 
         } else if (id==R.id.nav_send) {
 
+        }else if(id == R.id.nav_routing){
+            getSupportFragmentManager().beginTransaction().add(R.id.nav_map_view, new RoutingFragment(), "RoutingFrag").commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

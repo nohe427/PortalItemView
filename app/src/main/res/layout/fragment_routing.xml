@@ -1,0 +1,57 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="test.support.esri.com.portalitemview.RoutingFragment"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp">
+
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/input_layout_from"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:touchscreenBlocksFocus="false"
+        android:textAlignment="center">
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/from_route_location"
+        android:hint="@string/from_routing"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="189dp" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/input_layout_to"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:touchscreenBlocksFocus="false"
+        android:textAlignment="center"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/input_layout_from">
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/to_routing"
+        android:id="@+id/to_route_location"
+        android:layout_alignBottom="@+id/input_layout_to"
+        android:layout_alignParentStart="true" />
+
+</android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/router"
+        app:fabSize="mini"
+        android:src="@drawable/direction"
+        android:layout_marginTop="123dp"
+        android:layout_alignParentTop="false"
+        android:layout_alignEnd="@+id/input_layout_to"
+        app:backgroundTint="@android:color/transparent"
+        app:backgroundTintMode="screen" />
+
+</RelativeLayout>

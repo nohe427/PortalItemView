@@ -42,4 +42,6 @@
     <string name="base_map">Change Basemap</string>
     <string name="show_portal">Show Action Buttons</string>
     <string name="layers">Show Layers</string>
+    <string name="from_routing">From:</string>
+    <string name="to_routing">To:</string>
 </resources>
