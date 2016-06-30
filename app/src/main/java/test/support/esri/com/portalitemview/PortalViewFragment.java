@@ -88,9 +88,6 @@ public class PortalViewFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /*if(getActivity().getIntent().getStringExtra("point") == null){
-
-        }*/
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -177,8 +174,13 @@ public class PortalViewFragment extends Fragment {
                                             screenImage.setImageBitmap(BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length));
                                         }
                                         NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-                                       MenuItem loginMenuItem = navigationView.getMenu().getItem(0);
+                                        MenuItem loginMenuItem = navigationView.getMenu().getItem(0);
+                                        for(int i=0; i<navigationView.getMenu().size(); i++){
+                                            navigationView.getMenu().getItem(i).setEnabled(true);
+                                        }
+
                                         loginMenuItem.setTitle("Log Out");
+
                                     }catch (ExecutionException | InterruptedException ex){
 
                                     }

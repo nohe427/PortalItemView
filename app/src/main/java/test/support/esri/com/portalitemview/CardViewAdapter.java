@@ -84,6 +84,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.ViewHo
                                         .findViewById(R.id.nav_map_view);
                                 realMapView.setMap(portalMap);
 
+
                                 Toast.makeText(v.getContext(), "Loaded portal item "+portalDataset.get(position)
                                         .getPortalItemName(), Toast.LENGTH_SHORT).show();
                             } else if (portalMap.getLoadStatus() == LoadStatus.FAILED_TO_LOAD) {

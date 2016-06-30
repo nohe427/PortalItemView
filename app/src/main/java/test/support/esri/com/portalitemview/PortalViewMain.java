@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -19,7 +20,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -36,10 +36,12 @@ import com.esri.arcgisruntime.mapping.Basemap;
 import com.esri.arcgisruntime.mapping.LayerList;
 import com.esri.arcgisruntime.mapping.view.Callout;
 import com.esri.arcgisruntime.mapping.view.DefaultMapViewOnTouchListener;
+import com.esri.arcgisruntime.mapping.view.DrawStatus;
+import com.esri.arcgisruntime.mapping.view.DrawStatusChangedEvent;
+import com.esri.arcgisruntime.mapping.view.DrawStatusChangedListener;
 import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.portal.Portal;
-import com.esri.arcgisruntime.security.UserCredential;
 
 import java.util.ArrayList;
 
@@ -47,8 +49,8 @@ import java.util.ArrayList;
 public class PortalViewMain extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LogInFragment.OnFragmentInteractionListener, PortalViewFragment.OnFragmentInteractionListener,
 BasemapFragment.OnFragmentInteractionListener, ControlsFragment.OnFragmentInteractionListener, ShowLayersFragment.OnFragmentInteractionListener{
-    private MapView navMapView;
-    public static ArcGISMap navigationMap;
+    private static MapView navMapView;
+    public ArcGISMap navigationMap;
     private NavigationView navigationView;
     private Portal portal;
     private FragmentTransaction fragmentTransaction;
@@ -57,6 +59,7 @@ BasemapFragment.OnFragmentInteractionListener, ControlsFragment.OnFragmentIntera
     public static Menu globalMenu;
     private android.graphics.Point whereClicked;
     private Callout callout;
+    private SearchView searchView;
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -131,8 +134,26 @@ BasemapFragment.OnFragmentInteractionListener, ControlsFragment.OnFragmentIntera
             }
         });
             performArcGISOnlineQuery();
+
+        //implement event handler for map content changes
+        navMapView.addDrawStatusChangedListener(new DrawStatusChangedListener() {
+            @Override
+            public void drawStatusChanged(DrawStatusChangedEvent drawStatusChangedEvent) {
+                if(drawStatusChangedEvent.getDrawStatus() == DrawStatus.COMPLETED){
+                        if(navigationMap.getItem() !=null) {
+                            PortalViewMain.this.setTitle(navigationMap.getItem().getTitle());
+                        }
+                }
+            }
+        });
     }
 
+
+
+    //public static method to return map
+    public static ArcGISMap getCurrentMap(){
+       return navMapView.getMap();
+    }
 
 
     //inner class for extending single tap
@@ -176,21 +197,6 @@ BasemapFragment.OnFragmentInteractionListener, ControlsFragment.OnFragmentIntera
     @Override
     protected void onResume(){
             super.onResume();
-       /* Intent portalIntent = getIntent();
-        USERNAME = portalIntent.getStringExtra("username");
-        PASSWORD = portalIntent.getStringExtra("password");
-        if(USERNAME == null && PASSWORD==null){
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getApplicationContext(), "No user credentials provided", Toast.LENGTH_LONG).show();
-                }
-            });
-            return;
-        }else{
-
-        }*/
-
         if(menuTitle.equalsIgnoreCase("Log out")){
             for(int n=0; n < navigationView.getMenu().getItem(n).getSubMenu().size(); n++){
                 navigationView.getMenu().getItem(n).getSubMenu().getItem(n).setEnabled(true);
@@ -214,7 +220,7 @@ BasemapFragment.OnFragmentInteractionListener, ControlsFragment.OnFragmentIntera
         globalMenu = menu;
         getMenuInflater().inflate(R.menu.navigator, globalMenu);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView)menu.findItem(R.id.searchable).getActionView();
+        searchView = (SearchView)menu.findItem(R.id.searchable).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconified(false);
         searchView.setSubmitButtonEnabled(true);
@@ -262,6 +268,10 @@ BasemapFragment.OnFragmentInteractionListener, ControlsFragment.OnFragmentIntera
             }
 
         }else if(id == R.id.show_layers_option) {
+            Fragment fragment = getSupportFragmentManager().findFragmentByTag("Show_Layers_Frag");
+            if(fragment != null){
+                getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+            }
                 LayerList layerList = navigationMap.getOperationalLayers();
                 String layerName;
                 ArrayList<String> listOfLayerNames = new ArrayList<>();
@@ -288,37 +298,24 @@ BasemapFragment.OnFragmentInteractionListener, ControlsFragment.OnFragmentIntera
 
         if (id==R.id.nav_login) {
             // Handle the log in action
-            if(item.getTitle().toString().equalsIgnoreCase("Log in to Portal")){
-
-                if(findViewById(R.id.nav_map_view) != null){
+            if(item.getTitle().toString().equalsIgnoreCase("Log in to a Portal")){
                     fragmentManager = getSupportFragmentManager();
                     fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.nav_map_view, new LogInFragment(), "LOG_IN_FRAGMENT");
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.commit();
+                    LogInFragment logInFragment = new LogInFragment();
+                    fragmentTransaction.add(R.id.nav_map_view, logInFragment, "login_frag").commit();
 
-                }
             }
 
             //implement logic to log out of portal
             if(item.getTitle().toString().equalsIgnoreCase("Log out")){
-                portal.setCredential(new UserCredential("SDFADDF", "sdadfdsa"));
-                portal.addDoneLoadingListener(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(portal.getLoadStatus() != LoadStatus.LOADED){
-                            Toast.makeText(getApplicationContext(), "Logged out of Portal", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-                portal.loadAsync();
+
             }
 
 
         } else if (id == R.id.nav_3d) {
 
         } else if (id == R.id.nav_address) {
-
+        searchView.setFocusable(true);
         } else if (id== R.id.nav_share) {
 
         } else if (id==R.id.nav_send) {

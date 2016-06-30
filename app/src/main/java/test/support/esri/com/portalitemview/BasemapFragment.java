@@ -178,96 +178,108 @@ public class BasemapFragment extends Fragment {
         switch (mapID){
             case "delorme":
                 basemap_url = testData.get(mapID);
-                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                PortalViewMain.getCurrentMap().setBasemap(new Basemap(
                         new ArcGISTiledLayer(basemap_url)));
+                PortalViewMain.getCurrentMap().loadAsync();
                 getActivity().getSupportFragmentManager().beginTransaction().hide(
                         getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
                 ).commit();
                 break;
             case "imagery":
                 basemap_url = testData.get(mapID);
-                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                PortalViewMain.getCurrentMap().setBasemap(new Basemap(
                         new ArcGISTiledLayer(basemap_url)));
+                PortalViewMain.getCurrentMap().loadAsync();
                 getActivity().getSupportFragmentManager().beginTransaction().hide(
                         getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
                 ).commit();
                 break;
             case "natgeo":
                 basemap_url = testData.get(mapID);
-                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                PortalViewMain.getCurrentMap().setBasemap(new Basemap(
                         new ArcGISTiledLayer(basemap_url)));
+                PortalViewMain.getCurrentMap().loadAsync();
                 getActivity().getSupportFragmentManager().beginTransaction().hide(
                         getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
                 ).commit();
                 break;
             case "ocean":
                 basemap_url = testData.get(mapID);
-                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                PortalViewMain.getCurrentMap().setBasemap(new Basemap(
                         new ArcGISTiledLayer(basemap_url)));
+                PortalViewMain.getCurrentMap().loadAsync();
                 getActivity().getSupportFragmentManager().beginTransaction().hide(
                         getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
                 ).commit();
                 break;
             case "physical":
                 basemap_url = testData.get(mapID);
-                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                PortalViewMain.getCurrentMap().setBasemap(new Basemap(
                         new ArcGISTiledLayer(basemap_url)));
+                PortalViewMain.getCurrentMap().loadAsync();
                 getActivity().getSupportFragmentManager().beginTransaction().hide(
                         getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
                 ).commit();
                 break;
             case "relief":
                 basemap_url = testData.get(mapID);
-                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                PortalViewMain.getCurrentMap().setBasemap(new Basemap(
                         new ArcGISTiledLayer(basemap_url)));
+                PortalViewMain.getCurrentMap().loadAsync();
                 getActivity().getSupportFragmentManager().beginTransaction().hide(
                         getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
                 ).commit();
                 break;
             case "street":
                 basemap_url = testData.get(mapID);
-                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                PortalViewMain.getCurrentMap().setBasemap(new Basemap(
                         new ArcGISTiledLayer(basemap_url)));
+                PortalViewMain.getCurrentMap().loadAsync();
                 getActivity().getSupportFragmentManager().beginTransaction().hide(
                         getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
                 ).commit();
                 break;
             case "transportation":
                 basemap_url = testData.get(mapID);
-                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                PortalViewMain.getCurrentMap().setBasemap(new Basemap(
                         new ArcGISTiledLayer(basemap_url)));
+                PortalViewMain.getCurrentMap().loadAsync();
                 getActivity().getSupportFragmentManager().beginTransaction().hide(
                         getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
                 ).commit();
                 break;
             case "ustopo":
                 basemap_url = testData.get(mapID);
-                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                PortalViewMain.getCurrentMap().setBasemap(new Basemap(
                         new ArcGISTiledLayer(basemap_url)));
+                PortalViewMain.getCurrentMap().loadAsync();
                 getActivity().getSupportFragmentManager().beginTransaction().hide(
                         getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
                 ).commit();
                 break;
             case "world_business":
                 basemap_url = testData.get(mapID);
-                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                PortalViewMain.getCurrentMap().setBasemap(new Basemap(
                         new ArcGISTiledLayer(basemap_url)));
+                PortalViewMain.getCurrentMap().loadAsync();
                 getActivity().getSupportFragmentManager().beginTransaction().hide(
                         getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
                 ).commit();
                 break;
             case "world_dark":
                 basemap_url = testData.get(mapID);
-                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                PortalViewMain.getCurrentMap().setBasemap(new Basemap(
                         new ArcGISTiledLayer(basemap_url)));
+                PortalViewMain.getCurrentMap().loadAsync();
                 getActivity().getSupportFragmentManager().beginTransaction().hide(
                         getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
                 ).commit();
                 break;
             case "world_gray":
                 basemap_url = testData.get(mapID);
-                PortalViewMain.navigationMap.setBasemap(new Basemap(
+                PortalViewMain.getCurrentMap().setBasemap(new Basemap(
                         new ArcGISTiledLayer(basemap_url)));
+                PortalViewMain.getCurrentMap().loadAsync();
                 getActivity().getSupportFragmentManager().beginTransaction().hide(
                         getActivity().getSupportFragmentManager().findFragmentByTag("BasemapFrag")
                 ).commit();

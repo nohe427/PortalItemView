@@ -28,7 +28,7 @@ public class ShowLayersAdapter extends RecyclerView.Adapter<ShowLayersAdapter.Vi
     @Override
     public void onBindViewHolder(ShowLayersAdapter.ViewHolder holder, int position) {
                 TextView layerName = holder.testText;
-        layerName.setText(legendInfosList.get(position));
+                layerName.setText(legendInfosList.get(position));
     }
 
     @Override
