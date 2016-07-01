@@ -3,6 +3,7 @@ package test.support.esri.com.portalitemview;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.geometry.Polyline;
+import com.esri.arcgisruntime.geometry.SpatialReference;
 import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.mapping.view.Graphic;
 import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
@@ -58,8 +60,8 @@ public class RoutingFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private View routeFragmentView;
     private FloatingActionButton floatingRouteButton;
-    private RouteTask routeTask;
-    private final String AGO_ROUTING_SERVICE= "http://route.arcgis.com/arcgis/rest/services/World/Route";
+    private final String AGO_ROUTING_SERVICE= "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
+    //private final String AGO_ROUTING_SERVICE= "http://sampleserver3.arcgisonline.com/ArcGIS/rest/services/Network/USA/NAServer/Route";
 
 
     public RoutingFragment() {
@@ -103,60 +105,29 @@ public class RoutingFragment extends Fragment {
         floatingRouteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              GraphicsOverlay graphicsOverlay =  performRouting();
-                MapView routeMapView = (MapView)getActivity().findViewById(R.id.nav_map_view);
-                routeMapView.getGraphicsOverlays().add(graphicsOverlay);
-                getActivity().getSupportFragmentManager().beginTransaction().hide(
-                        getActivity().getSupportFragmentManager().findFragmentByTag("RoutingFrag")
-                ).commit();
+            new RoutingFragAsyncTask().execute();
             }
 
         });
         return routeFragmentView;
     }
 
-    private GraphicsOverlay performRouting() {
-
-        final GraphicsOverlay graphicsOverlay = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
-           final List<Point> fromToPoints = performGeocode();
-            routeTask = new RouteTask(AGO_ROUTING_SERVICE);
-            routeTask.loadAsync();
-            routeTask.addDoneLoadingListener(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        if(routeTask.getLoadStatus() == LoadStatus.LOADED){
-                        final RouteParameters routeParams = routeTask.generateDefaultParametersAsync().get();
-                        List<Stop> routeStops = routeParams.getStops();
-                        if(fromToPoints.size() != 0){
-                            routeStops.add(new Stop(fromToPoints.get(0)));
-                            routeStops.add(new Stop(fromToPoints.get(1)));
-                        }
-                            showMessage("invalid destinations");
-                        RouteResult routeResult = routeTask.solveAsync(routeParams).get();
-                        Route route = routeResult.getRoutes().get(0);
-                        Polyline routeLines = route.getRouteGeometry();
-
-                            Graphic routeGraphic = new Graphic(routeLines);
-                            Symbol routeSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.DASH, Color.BLUE, 4);
-                            routeGraphic.setSymbol(routeSymbol);
-                            graphicsOverlay.getGraphics().add(routeGraphic);
-
-                        }
-                    }catch(ExecutionException|InterruptedException inex){
-
-                    }
-                }
-            });
-        Log.d("KwasiRoutingTest", routeTask.getLoadStatus().toString());
-        return graphicsOverlay;
-    }
-
-    private void showMessage(String message) {
+       private void showMessage(String message) {
         Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
     }
 
-    private List<Point> performGeocode() {
+
+    public class RoutingFragAsyncTask extends AsyncTask<Void, Void, Void>{
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            performRouting();
+            return null;
+        }
+
+
+
+        private List<Point> performRouting() {
             final List<Point> geocodedPoints = new ArrayList<>();
             EditText fromRouteLocation = (EditText) routeFragmentView.findViewById(R.id.from_route_location);
             EditText toRouteLocation = (EditText) routeFragmentView.findViewById(R.id.to_route_location);
@@ -168,31 +139,90 @@ public class RoutingFragment extends Fragment {
                 @Override
                 public void run() {
 
-                        if(locatorTask.getLoadStatus() == LoadStatus.LOADED) {
-                            try {
+                    if(locatorTask.getLoadStatus() == LoadStatus.LOADED) {
+                        try {
+                            Log.d("KwasiLocatorLoaded: ", locatorTask.getLoadStatus().toString());
                             SuggestParameters suggestParams = new SuggestParameters();
                             suggestParams.setCountryCode("USA");
                             //perform for from location
                             List<SuggestResult> fromSuggestResults = locatorTask.suggestAsync(fromPoint, suggestParams).get();
                             List<GeocodeResult> fromSuggestGeocodedResult = locatorTask.geocodeAsync(fromSuggestResults.get(0)).get();
-                            geocodedPoints.add(fromSuggestGeocodedResult.get(0).getRouteLocation());
+                            geocodedPoints.add(new Point(fromSuggestGeocodedResult.get(0).getRouteLocation().getX(),
+                                    fromSuggestGeocodedResult.get(0).getRouteLocation().getY(),
+                                    SpatialReference.create(4326)));
 
                             //do likewise for to location
                             List<SuggestResult> toSuggestResults = locatorTask.suggestAsync(toPoint, suggestParams).get();
                             List<GeocodeResult> toSuggestGeocodedResult = locatorTask.geocodeAsync(toSuggestResults.get(0)).get();
-                            geocodedPoints.add(toSuggestGeocodedResult.get(0).getRouteLocation());
+                            geocodedPoints.add(new Point(toSuggestGeocodedResult.get(0).getRouteLocation().getX(),
+                                    toSuggestGeocodedResult.get(0).getRouteLocation().getY(),
+                                    SpatialReference.create(4326)));
 
-                }catch(ExecutionException|InterruptedException exIn){
+                            //start the routing proper
+                            final GraphicsOverlay graphicsOverlay = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
+                            final RouteTask routeTask = new RouteTask(AGO_ROUTING_SERVICE);
 
-                }
+                            routeTask.loadAsync();
+
+                            routeTask.addDoneLoadingListener(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        if(routeTask.getLoadStatus() == LoadStatus.LOADED){
+                                            // Log.d("KwasiRouteLoaded: ", routeTask.getLoadStatus().toString());
+                                            final RouteParameters routeParams = routeTask.generateDefaultParametersAsync().get();
+                                            List<Stop> routeStops = routeParams.getStops();
+                                            if(geocodedPoints.size() != 0){
+                                                routeStops.add(new Stop(geocodedPoints.get(0)));
+                                                routeStops.add(new Stop(geocodedPoints.get(1)));
+                                            }
+                                   /*getActivity().runOnUiThread(new Runnable() {
+                                       @Override
+                                       public void run() {
+                                           showMessage("invalid destinations");
+                                       }
+                                   });*/
+                                            RouteResult routeResult = routeTask.solveAsync(routeParams).get();
+                                            Route route = routeResult.getRoutes().get(0);
+                                            final Polyline routeLines = route.getRouteGeometry();
+
+                                            Graphic routeGraphic = new Graphic(routeLines);
+                                            Symbol routeSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.BLUE, 4);
+                                            routeGraphic.setSymbol(routeSymbol);
+                                            graphicsOverlay.getGraphics().add(routeGraphic);
+
+                                            getActivity().runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    MapView routeMapView = (MapView)getActivity().findViewById(R.id.nav_map_view);
+                                                    routeMapView.getGraphicsOverlays().add(graphicsOverlay);
+                                                    getActivity().getSupportFragmentManager().beginTransaction().hide(
+                                                            getActivity().getSupportFragmentManager().findFragmentByTag("RoutingFrag")
+                                                    ).commit();
+                                                    routeMapView.setViewpointGeometryWithPaddingAsync(routeLines, 250);
+                                                }
+                                            });
+                                        }
+                                    }catch(ExecutionException|InterruptedException inex){
+                                        Log.d("KwasiRouteException ", inex.getMessage());
+                                    }
+                                }
+                            });
+
+                        }catch(ExecutionException|InterruptedException exIn){
+
                         }
+                    }
                 }
             });
 
-        Log.d("KwasiRouteTest", locatorTask.getLoadStatus().toString());
+            Log.d("KwasiRouteTest", locatorTask.getLoadStatus().toString());
             return geocodedPoints;
-    }
+        }
 
+
+
+    }
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
