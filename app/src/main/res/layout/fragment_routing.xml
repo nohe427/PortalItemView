@@ -67,6 +67,58 @@
             android:layout_below="@+id/input_layout_to"
             android:layout_alignEnd="@+id/input_layout_to" />
 
+        <LinearLayout
+            android:id="@+id/route_information"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/background_floating_material_dark"
+            android:padding="5dp"
+            android:visibility="gone"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@+id/router">
+
+
+            <TextView
+                android:id="@+id/time_of_travel"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="@string/time_of_arrival"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/abc_primary_text_material_dark">
+
+            </TextView>
+
+            <TextView
+                android:id="@+id/arrival_time"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="@string/total_distance"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/abc_primary_text_material_dark">
+
+            </TextView>
+
+
+            <android.support.design.widget.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/directions"
+                app:fabSize="mini"
+                android:src="@drawable/navigation_car"
+                app:backgroundTint="@android:color/transparent"
+                app:backgroundTintMode="screen"
+                android:layout_gravity="right" />
+
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/voice_switcher"
+                android:textColor="@color/abc_primary_text_material_dark"
+                android:text="@string/switch_text"
+                android:layout_gravity="left" />
+        </LinearLayout>
+
 
     </RelativeLayout>
 
@@ -89,62 +141,7 @@
 
             </android.support.v7.widget.RecyclerView>
 
-            <LinearLayout
-                android:id="@+id/route_information"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@color/background_floating_material_dark"
-                android:elevation="30dp"
-                android:gravity="bottom"
-                android:layout_alignParentBottom="false"
-                android:layout_alignBottom="@+id/route_recycler_view"
-                android:layout_alignBaseline="@+id/route_recycler_view"
-                android:padding="5dp"
-                android:showDividers="middle">
 
-
-                <TextView
-                    android:id="@+id/time_of_travel"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:text="@string/time_of_arrival"
-                    android:layout_gravity="center_horizontal"
-                    android:textColor="@color/abc_primary_text_material_dark">
-
-                </TextView>
-
-                <TextView
-                    android:id="@+id/arrival_time"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:text="@string/total_distance"
-                    android:layout_gravity="center_horizontal"
-                    android:textColor="@color/abc_primary_text_material_dark">
-
-                </TextView>
-
-
-            <android.support.design.widget.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/directions"
-                app:fabSize="mini"
-                android:src="@drawable/navigation_car"
-                app:backgroundTint="@android:color/transparent"
-                app:backgroundTintMode="screen"
-                android:layout_gravity="right" />
-
-                <Switch
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/voice_switcher"
-                    android:textColor="@color/abc_primary_text_material_dark"
-                    android:text="@string/switch_text"
-                    android:layout_gravity="left" />
-            </LinearLayout>
         </RelativeLayout>
 
-
-
-    </android.support.v4.widget.DrawerLayout>
+</android.support.v4.widget.DrawerLayout>

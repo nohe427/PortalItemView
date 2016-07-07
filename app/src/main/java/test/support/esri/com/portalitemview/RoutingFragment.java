@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
-import android.speech.tts.UtteranceProgressListener;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
@@ -75,8 +74,8 @@ public class RoutingFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private View routeFragmentView;
     private FloatingActionButton floatingRouteButton;
-    //private final String AGO_ROUTING_SERVICE= "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
-    private final String AGO_ROUTING_SERVICE= "http://192.168.1.6:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
+    private final String AGO_ROUTING_SERVICE= "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
+//    private final String AGO_ROUTING_SERVICE= "http://192.168.1.6:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
     private ProgressDialog progressDialog;
     private  Route route;
     private DrawerLayout route_drawer_layout;
@@ -154,7 +153,7 @@ public class RoutingFragment extends Fragment {
                         }
                     });
 
-                    textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                   /* textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                         @Override
                         public void onStart(String utteranceId) {
                             showMessage("Starting speech engine");
@@ -167,17 +166,17 @@ public class RoutingFragment extends Fragment {
 
                         @Override
                         public void onError(String utteranceId) {
-                            showMessage("Speech engine error id: "+utteranceId);
+                            showMessage("Speech engine errored with id: "+utteranceId);
                         }
 
-                        @Override
+                      *//*  @Override
                         public void onStop(String utteranceId, boolean interrupted){
 //                            textToSpeech.shutdown();
                             showMessage("Speech engine shutdown");
 
-                        }
+                        }*//*
 
-                    });
+                    });*/
 
 
                 }
@@ -369,6 +368,7 @@ public class RoutingFragment extends Fragment {
                                                     +"Duration: "+convertMinutesToHoursMins(route.getTotalTime()));
                                                     TextView totalDistance = (TextView)routeFragmentView.findViewById(R.id.time_of_travel);
                                                     totalDistance.setText("Distance: "+convertMetersToMiles(route.getTotalLength())+ " mi");
+                                                    routeFragmentView.findViewById(R.id.route_information).setVisibility(View.VISIBLE);
                                                     /*LinearLayout linearLayout = (LinearLayout)routeFragmentView.findViewById(
                                                             R.id.from_to_layout);
                                                     route_drawer_layout.openDrawer(linearLayout
@@ -434,16 +434,6 @@ public class RoutingFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
