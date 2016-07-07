@@ -1,17 +1,28 @@
 package test.support.esri.com.portalitemview;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.esri.arcgisruntime.geometry.Point;
@@ -21,18 +32,22 @@ import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.mapping.view.Graphic;
 import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
 import com.esri.arcgisruntime.mapping.view.MapView;
+import com.esri.arcgisruntime.symbology.PictureMarkerSymbol;
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
+import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
 import com.esri.arcgisruntime.symbology.Symbol;
 import com.esri.arcgisruntime.tasks.geocode.GeocodeResult;
 import com.esri.arcgisruntime.tasks.geocode.LocatorTask;
 import com.esri.arcgisruntime.tasks.geocode.SuggestParameters;
 import com.esri.arcgisruntime.tasks.geocode.SuggestResult;
+import com.esri.arcgisruntime.tasks.route.DirectionManeuver;
 import com.esri.arcgisruntime.tasks.route.Route;
 import com.esri.arcgisruntime.tasks.route.RouteParameters;
 import com.esri.arcgisruntime.tasks.route.RouteResult;
 import com.esri.arcgisruntime.tasks.route.RouteTask;
 import com.esri.arcgisruntime.tasks.route.Stop;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -60,7 +75,14 @@ public class RoutingFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private View routeFragmentView;
     private FloatingActionButton floatingRouteButton;
-    private final String AGO_ROUTING_SERVICE= "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
+    //private final String AGO_ROUTING_SERVICE= "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
+    private final String AGO_ROUTING_SERVICE= "http://192.168.1.6:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
+    private ProgressDialog progressDialog;
+    private  Route route;
+    private DrawerLayout route_drawer_layout;
+    private FloatingActionButton directionsFloatingButton;
+    private TextToSpeech textToSpeech;
+    private Switch switcher;
     //private final String AGO_ROUTING_SERVICE= "http://sampleserver3.arcgisonline.com/ArcGIS/rest/services/Network/USA/NAServer/Route";
 
 
@@ -109,12 +131,75 @@ public class RoutingFragment extends Fragment {
             }
 
         });
+
+        route_drawer_layout = (DrawerLayout)routeFragmentView.findViewById(R.id.route_drawer_layout);
+        directionsFloatingButton = (FloatingActionButton)routeFragmentView.findViewById(R.id.directions);
+
+
+
+
+
+        //implement logic for the initialization of speech
+        switcher = (Switch)routeFragmentView.findViewById(R.id.voice_switcher);
+        switcher.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(switcher.isChecked()){
+
+                    textToSpeech = new TextToSpeech(getContext(), new TextToSpeech.OnInitListener() {
+                        @Override
+                        public void onInit(int status) {
+                            if(status == TextToSpeech.SUCCESS)
+                                showMessage("Speech engine initialized successfully");
+                        }
+                    });
+
+                    textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                        @Override
+                        public void onStart(String utteranceId) {
+                            showMessage("Starting speech engine");
+                        }
+
+                        @Override
+                        public void onDone(String utteranceId) {
+                            showMessage("Speech completed");
+                        }
+
+                        @Override
+                        public void onError(String utteranceId) {
+                            showMessage("Speech engine error id: "+utteranceId);
+                        }
+
+                        @Override
+                        public void onStop(String utteranceId, boolean interrupted){
+//                            textToSpeech.shutdown();
+                            showMessage("Speech engine shutdown");
+
+                        }
+
+                    });
+
+
+                }
+            }
+        });
+//        route_drawer_layout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END);
+        //route_drawer_layout.closeDrawer(GravityCompat.END);
         return routeFragmentView;
     }
 
-       private void showMessage(String message) {
-        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+       private void showMessage(final String message) {
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+            }
+        });
     }
+
+
+
 
 
     public class RoutingFragAsyncTask extends AsyncTask<Void, Void, Void>{
@@ -125,6 +210,34 @@ public class RoutingFragment extends Fragment {
             return null;
         }
 
+
+
+        @Override
+        protected void onPreExecute(){
+        }
+
+        @Override
+        protected void onPostExecute(Void value){
+        }
+
+
+        private double convertMetersToMiles(double metersValue){
+            DecimalFormat decimalFormat = new DecimalFormat("##");
+            return Double.parseDouble(decimalFormat.format(metersValue * 0.0006214));
+        }
+
+        private String convertMinutesToHoursMins(double mins){
+            double hours = mins/60;
+            DecimalFormat decimalFormat = new DecimalFormat("##");
+            if(hours < 1){
+                double minutes = mins;
+
+                return String.valueOf(decimalFormat.format(minutes)) + " min";
+            }else {
+                double minutes = mins % 60;
+                return String.valueOf(decimalFormat.format(hours)) + " h" + String.valueOf(decimalFormat.format(minutes)) + " min";
+            }
+        }
 
 
         private List<Point> performRouting() {
@@ -141,6 +254,18 @@ public class RoutingFragment extends Fragment {
 
                     if(locatorTask.getLoadStatus() == LoadStatus.LOADED) {
                         try {
+
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                   /* routingProgressBar.setVisibility(View.VISIBLE);
+                                    routingProgressBar.setIndeterminate(true);*/
+                                    progressDialog = ProgressDialog.show(getContext(),
+                                            "Calculating Route...", "Please waiting... calculating route",
+                                            true);
+                                    progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                                }
+                            });
                             Log.d("KwasiLocatorLoaded: ", locatorTask.getLoadStatus().toString());
                             SuggestParameters suggestParams = new SuggestParameters();
                             suggestParams.setCountryCode("USA");
@@ -169,37 +294,97 @@ public class RoutingFragment extends Fragment {
                                 public void run() {
                                     try {
                                         if(routeTask.getLoadStatus() == LoadStatus.LOADED){
-                                            // Log.d("KwasiRouteLoaded: ", routeTask.getLoadStatus().toString());
                                             final RouteParameters routeParams = routeTask.generateDefaultParametersAsync().get();
+                                            routeParams.setReturnDirections(true);
                                             List<Stop> routeStops = routeParams.getStops();
                                             if(geocodedPoints.size() != 0){
                                                 routeStops.add(new Stop(geocodedPoints.get(0)));
                                                 routeStops.add(new Stop(geocodedPoints.get(1)));
                                             }
-                                   /*getActivity().runOnUiThread(new Runnable() {
-                                       @Override
-                                       public void run() {
-                                           showMessage("invalid destinations");
-                                       }
-                                   });*/
+
                                             RouteResult routeResult = routeTask.solveAsync(routeParams).get();
-                                            Route route = routeResult.getRoutes().get(0);
+                                            route = routeResult.getRoutes().get(0);
                                             final Polyline routeLines = route.getRouteGeometry();
 
-                                            Graphic routeGraphic = new Graphic(routeLines);
+                                            //construct route lines and add to graphicsoverlay
+                                            final Graphic routeGraphic = new Graphic(routeLines);
                                             Symbol routeSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.BLUE, 4);
                                             routeGraphic.setSymbol(routeSymbol);
                                             graphicsOverlay.getGraphics().add(routeGraphic);
 
+
+                                            //construct origin and destination and add to layer
+                                            Uri uri =Uri.parse("android.resource://test.support.esri.com/"+R.drawable.geolocation);
+                                            PictureMarkerSymbol originMarkerSymbol = new PictureMarkerSymbol(
+                                                 new BitmapDrawable(getResources(), BitmapFactory.decodeFile(uri.getPath())));
+                                            originMarkerSymbol.loadAsync();
+                                            SimpleMarkerSymbol originMarkerSym = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.DIAMOND,
+                                                    Color.GREEN, 15);
+                                            Graphic originGraphic = new Graphic(geocodedPoints.get(0), originMarkerSym);
+                                            graphicsOverlay.getGraphics().add(originGraphic);
+                                            /*Point originPoint = new Point(geocodedPoints.get(0).getX(),geocodedPoints.get(0).getY(),
+                                                    SpatialReference.create(4326));
+                                            Graphic originGraphic = new Graphic(geocodedPoints.get(0), originMarkerSymbol);
+                                            graphicsOverlay.getGraphics().add(originGraphic);
+
+                                            Point destinationPoint = new Point(geocodedPoints.get(1).getX(),geocodedPoints.get(1).getY(),
+                                                    SpatialReference.create(4326));
+                                            PictureMarkerSymbol destinationMarkerSymbol = new PictureMarkerSymbol(new BitmapDrawable(getResources(), BitmapFactory.decodeFile("/res/drawable/geolocation.xml")));
+                                            destinationMarkerSymbol.loadAsync();*/
+
+                                            SimpleMarkerSymbol destinationMarkerSym = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.TRIANGLE,
+                                                    Color.RED, 20);
+                                            Graphic destinationGraphic = new Graphic(geocodedPoints.get(1), destinationMarkerSym);
+                                            graphicsOverlay.getGraphics().add(destinationGraphic);
                                             getActivity().runOnUiThread(new Runnable() {
                                                 @Override
                                                 public void run() {
                                                     MapView routeMapView = (MapView)getActivity().findViewById(R.id.nav_map_view);
                                                     routeMapView.getGraphicsOverlays().add(graphicsOverlay);
-                                                    getActivity().getSupportFragmentManager().beginTransaction().hide(
+                                                   /* getActivity().getSupportFragmentManager().beginTransaction().hide(
                                                             getActivity().getSupportFragmentManager().findFragmentByTag("RoutingFrag")
-                                                    ).commit();
+                                                    ).commit()*/;
+                                                    /*getActivity().getSupportFragmentManager().findFragmentByTag("RoutingFrag")
+                                                            .getView().findViewById(R.id.from_to_layout).setVisibility(View.GONE);*/
+                                                    routeFragmentView.findViewById(R.id.from_to_layout).setVisibility(View.GONE);
+
                                                     routeMapView.setViewpointGeometryWithPaddingAsync(routeLines, 250);
+                                                    /*routingProgressBar.setIndeterminate(false);
+                                                    routingProgressBar.setVisibility(View.INVISIBLE);*/
+                                                    progressDialog.dismiss();
+                                                    RecyclerView routeRecycler = (RecyclerView) routeFragmentView.findViewById(R.id.route_recycler_view);
+                                                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+                                                    routeRecycler.setLayoutManager(linearLayoutManager);
+                                                    final ArrayList<DirectionManeuver> directionManeuvers = new ArrayList<>(route.getDirectionManeuvers());
+
+                                                    RoutingManouversData routingManouversData = new RoutingManouversData(directionManeuvers, route);
+                                                    RoutingManouvAdapter routeInfoAdapter = new RoutingManouvAdapter(routingManouversData);
+                                                    routeRecycler.setAdapter(routeInfoAdapter);
+                                                    routeFragmentView.findViewById(R.id.route_information).setVisibility(View.VISIBLE);
+                                                    routeFragmentView.findViewById(R.id.route_results_layout).setVisibility(View.VISIBLE);
+                                                    TextView arrivalTime = (TextView) routeFragmentView.findViewById(R.id.arrival_time);
+
+                                                    arrivalTime.setText("Arrive: "+route.getLocalEndTime().HOUR +":"+
+                                                    route.getLocalEndTime().MINUTE + "\n "
+                                                    +"Duration: "+convertMinutesToHoursMins(route.getTotalTime()));
+                                                    TextView totalDistance = (TextView)routeFragmentView.findViewById(R.id.time_of_travel);
+                                                    totalDistance.setText("Distance: "+convertMetersToMiles(route.getTotalLength())+ " mi");
+                                                    /*LinearLayout linearLayout = (LinearLayout)routeFragmentView.findViewById(
+                                                            R.id.from_to_layout);
+                                                    route_drawer_layout.openDrawer(linearLayout
+                                                    );*/
+
+                                                    route_drawer_layout.openDrawer(GravityCompat.END);
+                                                    directionsFloatingButton.setOnClickListener(new View.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(View v) {
+                                                            for(int i=0; i < directionManeuvers.size(); i++){
+                                                                textToSpeech.speak(directionManeuvers.get(i).getDirectionText(), TextToSpeech.QUEUE_FLUSH,
+                                                                        null, "stringUtterID");
+                                                            }
+                                                        }
+                                                    });
+
                                                 }
                                             });
                                         }
@@ -229,6 +414,8 @@ public class RoutingFragment extends Fragment {
             mListener.onFragmentInteraction(uri);
         }
     }
+
+
 
     @Override
     public void onAttach(Context context) {

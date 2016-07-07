@@ -1,57 +1,150 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+
+<android.support.v4.widget.DrawerLayout
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="test.support.esri.com.portalitemview.RoutingFragment"
-    android:paddingLeft="20dp"
-    android:paddingRight="20dp">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/route_drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
+    <RelativeLayout
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/input_layout_from"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:touchscreenBlocksFocus="false"
-        android:textAlignment="center">
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/from_route_location"
-        android:hint="@string/from_routing"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="189dp" />
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="20dp"
+
+        android:id="@+id/from_to_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_layout_from"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:touchscreenBlocksFocus="false"
+            android:textAlignment="center"
+            android:background="@color/button_material_dark">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/from_route_location"
+            android:hint="@string/from_routing"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/abc_primary_text_material_dark" />
     </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
+        <android.support.design.widget.TextInputLayout
         android:id="@+id/input_layout_to"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:touchscreenBlocksFocus="false"
         android:textAlignment="center"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/input_layout_from">
+            android:layout_below="@+id/input_layout_from"
+            android:layout_alignParentStart="true"
+            android:background="@color/button_material_dark">
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/to_routing"
         android:id="@+id/to_route_location"
         android:layout_alignBottom="@+id/input_layout_to"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:textColor="@color/abc_primary_text_material_dark" />
 
 </android.support.design.widget.TextInputLayout>
 
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        <android.support.design.widget.FloatingActionButton
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:id="@+id/router"
         app:fabSize="mini"
         android:src="@drawable/direction"
-        android:layout_marginTop="123dp"
-        android:layout_alignParentTop="false"
-        android:layout_alignEnd="@+id/input_layout_to"
         app:backgroundTint="@android:color/transparent"
-        app:backgroundTintMode="screen" />
+        app:backgroundTintMode="screen"
+        android:layout_gravity="right"
+            android:layout_below="@+id/input_layout_to"
+            android:layout_alignEnd="@+id/input_layout_to" />
 
-</RelativeLayout>
+
+    </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/route_results_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginTop="130dp"
+            android:layout_gravity="right"
+            android:background="@color/background_floating_material_dark">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/route_recycler_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:padding="10dp">
+
+            </android.support.v7.widget.RecyclerView>
+
+            <LinearLayout
+                android:id="@+id/route_information"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/background_floating_material_dark"
+                android:elevation="30dp"
+                android:gravity="bottom"
+                android:layout_alignParentBottom="false"
+                android:layout_alignBottom="@+id/route_recycler_view"
+                android:layout_alignBaseline="@+id/route_recycler_view"
+                android:padding="5dp"
+                android:showDividers="middle">
+
+
+                <TextView
+                    android:id="@+id/time_of_travel"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="@string/time_of_arrival"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/abc_primary_text_material_dark">
+
+                </TextView>
+
+                <TextView
+                    android:id="@+id/arrival_time"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="@string/total_distance"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/abc_primary_text_material_dark">
+
+                </TextView>
+
+
+            <android.support.design.widget.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/directions"
+                app:fabSize="mini"
+                android:src="@drawable/navigation_car"
+                app:backgroundTint="@android:color/transparent"
+                app:backgroundTintMode="screen"
+                android:layout_gravity="right" />
+
+                <Switch
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/voice_switcher"
+                    android:textColor="@color/abc_primary_text_material_dark"
+                    android:text="@string/switch_text"
+                    android:layout_gravity="left" />
+            </LinearLayout>
+        </RelativeLayout>
+
+
+
+    </android.support.v4.widget.DrawerLayout>

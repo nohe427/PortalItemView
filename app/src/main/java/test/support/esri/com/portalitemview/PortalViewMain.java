@@ -5,7 +5,9 @@ import android.annotation.TargetApi;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -39,9 +41,12 @@ import com.esri.arcgisruntime.mapping.view.DefaultMapViewOnTouchListener;
 import com.esri.arcgisruntime.mapping.view.DrawStatus;
 import com.esri.arcgisruntime.mapping.view.DrawStatusChangedEvent;
 import com.esri.arcgisruntime.mapping.view.DrawStatusChangedListener;
+import com.esri.arcgisruntime.mapping.view.Graphic;
+import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
 import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.portal.Portal;
+import com.esri.arcgisruntime.symbology.PictureMarkerSymbol;
 
 import java.util.ArrayList;
 
@@ -198,6 +203,12 @@ RoutingFragment.OnFragmentInteractionListener{
         if(doubleArray !=null){
             Point point = new Point(doubleArray[0], doubleArray[1],
                     SpatialReference.create(new Double(doubleArray[2]).intValue()));
+            PictureMarkerSymbol geocodeMarkerSym = new PictureMarkerSymbol(new BitmapDrawable(getResources(),
+                    BitmapFactory.decodeResource(getResources(), R.drawable.geolocation)));
+            Graphic geocodedPointGraphic = new Graphic(point, geocodeMarkerSym);
+            GraphicsOverlay graphicsOverlay = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
+            graphicsOverlay.getGraphics().add(geocodedPointGraphic);
+            navMapView.getGraphicsOverlays().add(graphicsOverlay);
             navMapView.setViewpointCenterWithScaleAsync(point, 100);
         }
     }
@@ -331,12 +342,21 @@ RoutingFragment.OnFragmentInteractionListener{
         } else if (id==R.id.nav_send) {
 
         }else if(id == R.id.nav_routing){
-            getSupportFragmentManager().beginTransaction().add(R.id.nav_map_view, new RoutingFragment(), "RoutingFrag").commit();
+                enterNavigationMode();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+
+    public void enterNavigationMode(){
+        LocationDisplay locationDisplay = navMapView.getLocationDisplay();
+        locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.NAVIGATION);
+        locationDisplay.startAsync();
+
+       getSupportFragmentManager().beginTransaction().add(R.id.nav_map_view, new RoutingFragment(), "RoutingFrag").commit();
     }
 
     @Override

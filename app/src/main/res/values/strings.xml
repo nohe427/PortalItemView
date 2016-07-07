@@ -37,11 +37,16 @@
     <string name="num_views">num_views</string>
     <string name="num_rating">num_ratings</string>
     <string name="date_modified">date_modified</string>
-    <string name="search_icon">search places</string>
+    <string name="search_icon">Search for portal items</string>
     <string name="search_hint">Search for places</string>
     <string name="base_map">Change Basemap</string>
     <string name="show_portal">Show Action Buttons</string>
     <string name="layers">Show Layers</string>
     <string name="from_routing">From:</string>
     <string name="to_routing">To:</string>
+    <string name="turn_by_turn">Turn by Turn Directions</string>
+    <string name="time_of_arrival">Time of Arrival</string>
+    <string name="total_distance">Total Distance</string>
+    <string name="route_image_desc">route turn description</string>
+    <string name="switch_text">Voice Guidance</string>
 </resources>

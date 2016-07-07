@@ -1,5 +1,6 @@
 package test.support.esri.com.portalitemview;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -60,6 +61,7 @@ public class PortalViewFragment extends Fragment {
     private LinearLayoutManager mLinearLayout;
     private String username;
     private String password;
+    private ProgressDialog progressDialog;
 
     private OnFragmentInteractionListener mListener;
 
@@ -142,6 +144,29 @@ public class PortalViewFragment extends Fragment {
 
         }
 
+        private boolean activateItems(boolean activation){
+            NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+            MenuItem loginMenuItem = navigationView.getMenu().getItem(1);
+            if(activation)
+                loginMenuItem.setTitle("Log Out");
+            for(int i=0; i<navigationView.getMenu().size(); i++){
+                navigationView.getMenu().getItem(i).setEnabled(activation);
+               if(navigationView.getMenu().getItem(i).getTitle().toString().equalsIgnoreCase("ArcGIS Community")){
+                  for(int c=0; c < navigationView.getMenu().getItem(i).getSubMenu().size(); c++){
+                      navigationView.getMenu().getItem(i).getSubMenu().getItem(c).setEnabled(true);
+                  }
+               }
+/*
+                if(navigationView.getMenu().getItem(i).getTitle().toString().equalsIgnoreCase("Configuration")){
+                    for(int a=0; a < navigationView.getMenu().getItem(i).getSubMenu().size(); a++){
+                        navigationView.getMenu().getItem(i).getSubMenu().getItem(a).setEnabled(true);
+                    }
+                }*/
+            }
+            return activation;
+        }
+
+
         @Override
         protected Void doInBackground(Void... params) {
             if(username == null && password == null){
@@ -160,6 +185,8 @@ public class PortalViewFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     try {
+                                        progressDialog = ProgressDialog.show(getContext(), "Loading... ",
+                                                "Loading content from "+portal.getUri().toString(), true);
                                         Snackbar.make(getActivity().findViewById(R.id.nav_map_view), "Portal loaded for "+
                                         portal.getPortalUser().getFullName(), Snackbar.LENGTH_LONG).show();
                                         TextView screen_name = (TextView) getActivity().findViewById(R.id.screen_name);
@@ -168,18 +195,13 @@ public class PortalViewFragment extends Fragment {
                                         byte[] imgByte = portal.getPortalUser().fetchThumbnailAsync().get();
 
                                         if(imgByte == null){
-                                            Snackbar.make(getActivity().findViewById(R.id.nav_view), "No thumbnail set for user: "
-                                            +portal.getPortalUser().getUserName(), Snackbar.LENGTH_LONG).show();
+                                            Snackbar.make(getActivity().findViewById(R.id.nav_view), "No thumbnail set for "
+                                            +portal.getPortalUser().getFullName(), Snackbar.LENGTH_LONG).show();
                                         }else {
                                             screenImage.setImageBitmap(BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length));
                                         }
-                                        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-                                        MenuItem loginMenuItem = navigationView.getMenu().getItem(0);
-                                        for(int i=0; i<navigationView.getMenu().size(); i++){
-                                            navigationView.getMenu().getItem(i).setEnabled(true);
-                                        }
 
-                                        loginMenuItem.setTitle("Log Out");
+                                            activateItems(true);
 
                                     }catch (ExecutionException | InterruptedException ex){
 
@@ -221,6 +243,7 @@ public class PortalViewFragment extends Fragment {
                                     mLinearLayout = new LinearLayoutManager(getActivity());
                                     recyclerView.setLayoutManager(mLinearLayout);
                                     recyclerView.setAdapter(mAdapter);
+                                    progressDialog.dismiss();
 
                                 }
                             });
