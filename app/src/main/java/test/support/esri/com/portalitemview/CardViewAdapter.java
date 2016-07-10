@@ -3,7 +3,6 @@ package test.support.esri.com.portalitemview;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.esri.arcgisruntime.layers.ArcGISVectorTiledLayer;
 import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.view.MapView;
@@ -58,7 +56,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.ViewHo
         final ImageView holderImageView = holder.imageView;
         holderNameView.setText(" Item Title: "+portalDataset.get(position).getPortalItemTitle());
         holderImageView.setImageBitmap(portalDataset.get(position).getmBitmap());
-        holderDescView.setText(portalDataset.get(position).getPortalItem().getDescription());
+        //holderDescView.setText(portalDataset.get(position).getPortalItem().getDescription());
         holderOwnerView.setText(" Owner: "+portalDataset.get(position).getPortalItem().getOwner());
         Date date = new Date(portalDataset.get(position).getPortalItem().getModified());
         Calendar cal = Calendar.getInstance();
@@ -98,7 +96,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.ViewHo
                 }
 
                 //trying to demonstrated a reported issue on early adopter
-                final ArcGISVectorTiledLayer vectorTiledLayer = new ArcGISVectorTiledLayer(portalDataset.get(position)
+                /*final ArcGISVectorTiledLayer vectorTiledLayer = new ArcGISVectorTiledLayer(portalDataset.get(position)
                 .getPortalItem());
                 vectorTiledLayer.loadAsync();
                 vectorTiledLayer.addDoneLoadingListener(new Runnable() {
@@ -111,7 +109,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.ViewHo
                         realMapView.getMap().getOperationalLayers().add(vectorTiledLayer);
                        Log.d("KwasiIDTest", realMapView.getMap().getOperationalLayers().get(0).getName());
                     }
-                });
+                });*/
             }
         });
 

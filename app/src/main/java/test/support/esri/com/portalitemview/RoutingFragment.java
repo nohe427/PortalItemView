@@ -74,8 +74,8 @@ public class RoutingFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private View routeFragmentView;
     private FloatingActionButton floatingRouteButton;
-    private final String AGO_ROUTING_SERVICE= "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
-//    private final String AGO_ROUTING_SERVICE= "http://192.168.1.6:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
+//    private final String AGO_ROUTING_SERVICE= "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
+    private final String AGO_ROUTING_SERVICE= "http://192.168.1.6:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
     private ProgressDialog progressDialog;
     private  Route route;
     private DrawerLayout route_drawer_layout;
@@ -133,7 +133,10 @@ public class RoutingFragment extends Fragment {
 
         route_drawer_layout = (DrawerLayout)routeFragmentView.findViewById(R.id.route_drawer_layout);
         directionsFloatingButton = (FloatingActionButton)routeFragmentView.findViewById(R.id.directions);
-
+/*ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(getActivity(), route_drawer_layout,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        route_drawer_layout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();*/
 
 
 
@@ -152,33 +155,11 @@ public class RoutingFragment extends Fragment {
                                 showMessage("Speech engine initialized successfully");
                         }
                     });
+                    textToSpeech.setSpeechRate(0.8f);
 
-                   /* textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-                        @Override
-                        public void onStart(String utteranceId) {
-                            showMessage("Starting speech engine");
-                        }
-
-                        @Override
-                        public void onDone(String utteranceId) {
-                            showMessage("Speech completed");
-                        }
-
-                        @Override
-                        public void onError(String utteranceId) {
-                            showMessage("Speech engine errored with id: "+utteranceId);
-                        }
-
-                      *//*  @Override
-                        public void onStop(String utteranceId, boolean interrupted){
-//                            textToSpeech.shutdown();
-                            showMessage("Speech engine shutdown");
-
-                        }*//*
-
-                    });*/
-
-
+                }
+                if(!switcher.isChecked()){
+                    textToSpeech.shutdown();
                 }
             }
         });
@@ -222,7 +203,11 @@ public class RoutingFragment extends Fragment {
 
         private double convertMetersToMiles(double metersValue){
             DecimalFormat decimalFormat = new DecimalFormat("##");
-            return Double.parseDouble(decimalFormat.format(metersValue * 0.0006214));
+            double milesValue =  Double.parseDouble(decimalFormat.format(metersValue * 0.0006214));
+            if(milesValue < 1){
+                return metersValue;
+            }
+            return milesValue;
         }
 
         private String convertMinutesToHoursMins(double mins){
@@ -367,20 +352,25 @@ public class RoutingFragment extends Fragment {
                                                     route.getLocalEndTime().MINUTE + "\n "
                                                     +"Duration: "+convertMinutesToHoursMins(route.getTotalTime()));
                                                     TextView totalDistance = (TextView)routeFragmentView.findViewById(R.id.time_of_travel);
+
                                                     totalDistance.setText("Distance: "+convertMetersToMiles(route.getTotalLength())+ " mi");
-                                                    routeFragmentView.findViewById(R.id.route_information).setVisibility(View.VISIBLE);
-                                                    /*LinearLayout linearLayout = (LinearLayout)routeFragmentView.findViewById(
-                                                            R.id.from_to_layout);
-                                                    route_drawer_layout.openDrawer(linearLayout
-                                                    );*/
 
                                                     route_drawer_layout.openDrawer(GravityCompat.END);
                                                     directionsFloatingButton.setOnClickListener(new View.OnClickListener() {
                                                         @Override
                                                         public void onClick(View v) {
-                                                            for(int i=0; i < directionManeuvers.size(); i++){
-                                                                textToSpeech.speak(directionManeuvers.get(i).getDirectionText(), TextToSpeech.QUEUE_FLUSH,
-                                                                        null, "stringUtterID");
+/*
+                                                            getActivity().getSupportFragmentManager().beginTransaction().hide(
+                                                                   getActivity().getSupportFragmentManager().findFragmentByTag("RoutingFrag")
+                                                            ).commit();*/
+                                                            route_drawer_layout.closeDrawer(GravityCompat.END);
+                                                            routeFragmentView.findViewById(R.id.route_results_layout).setVisibility(View.VISIBLE);
+                                                            if(textToSpeech != null) {
+                                                                for (int i = 0; i < directionManeuvers.size(); i++) {
+
+                                                                    textToSpeech.speak(directionManeuvers.get(i).getDirectionText(), TextToSpeech.QUEUE_ADD,
+                                                                            null, "stringUtterID");
+                                                                }
                                                             }
                                                         }
                                                     });

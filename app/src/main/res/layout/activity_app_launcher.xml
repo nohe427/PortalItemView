@@ -36,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/sign_in_to_arcgis_online_or_your_portal"
-        android:id="@+id/textView"
+        android:id="@+id/user_information"
         android:layout_below="@+id/app_name"
         android:layout_centerHorizontal="true"
         android:textColor="@color/abc_primary_text_material_dark"
@@ -45,7 +45,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Use without signing in to a portal"
+        android:text="@string/anonymous_access"
         android:id="@+id/use_without"
         android:textColor="@color/abc_primary_text_disable_only_material_dark"
         android:clickable="true"

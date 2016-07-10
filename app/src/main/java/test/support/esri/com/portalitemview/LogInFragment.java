@@ -33,6 +33,7 @@ public class LogInFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String username;
     private String password;
+    private String portalURL;
     Button resetButton;
     Button loginButton;
     static EditText txtUsername;
@@ -41,6 +42,8 @@ public class LogInFragment extends Fragment {
     private RadioButton radio_portal;
     private RadioButton radio_arcgis;
     private EditText txtPortalURL;
+    private Bundle argBundle;
+
 
 
     public LogInFragment() {
@@ -84,12 +87,13 @@ public class LogInFragment extends Fragment {
 
     private void loginToPortal() {
         //check for empty content
-
+       boolean isPortalChecked = false;
         if(radio_portal.isChecked() && txtPortalURL.getText().toString().length() == 0){
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     Toast.makeText(mainView.getContext(), "Please provide a portal url", Toast.LENGTH_LONG).show();
+                    return;
                 }
             });
         }
@@ -104,12 +108,19 @@ public class LogInFragment extends Fragment {
             return;
         }
 
+        if(radio_portal.isChecked() && txtPortalURL.getText().toString().length() != 0){
+                isPortalChecked = true;
+        }
+
         username = txtUsername.getText().toString().trim();
         password = txtPassword.getText().toString().trim();
-        Bundle argBundle = new Bundle();
+        portalURL = txtPortalURL.getText().toString().trim();
+        argBundle = new Bundle();
         argBundle.putString("USERNAME", username);
         argBundle.putString("PASSWORD", password);
         argBundle.putString("FRAGMENTTAG", "portal_view_fragment");
+        argBundle.putBoolean("isPortalChecked", isPortalChecked);
+        argBundle.putString("portalURL", portalURL);
         Intent navigatorIntent = new Intent(getContext(), PortalViewMain.class);
         navigatorIntent.putExtra("USERNAME", username);
         navigatorIntent.putExtra("PASSWORD", password);

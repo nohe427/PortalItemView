@@ -28,25 +28,20 @@ public class RoutingManouvAdapter extends RecyclerView.Adapter<RoutingManouvAdap
     }
 
 
-    public double convertToMile(double length){
+    public String convertToMile(double length){
         DecimalFormat decimalFormat = new DecimalFormat("##");
         double mile = Double.parseDouble(decimalFormat.format(length * 0.0006214));
         if(mile < 1){
-            return length;
+            return Double.parseDouble(decimalFormat.format(length)) + " m";
         }else {
-            return mile;
+            return mile + " mi";
         }
     }
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
                 String directionsText =  routingData.getDirectionManeuvers().get(position).getDirectionText();
                 holder.routeDirections.setText(directionsText);
-                double meters = convertToMile(routingData.getDirectionManeuvers().get(position).getLength());
-                if(meters < 1){
-                    holder.manouverMessage.setText(String.valueOf(meters)+ " meters");
-                }else{
-                    holder.manouverMessage.setText(String.valueOf(meters)+ " mi");
-                }
+                holder.manouverMessage.setText(convertToMile(routingData.getDirectionManeuvers().get(position).getLength()));
     }
 
 

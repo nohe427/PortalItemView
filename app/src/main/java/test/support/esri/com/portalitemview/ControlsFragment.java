@@ -1,15 +1,32 @@
 package test.support.esri.com.portalitemview;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import com.esri.arcgisruntime.mapping.Item;
+import com.esri.arcgisruntime.mapping.view.MapView;
+import com.esri.arcgisruntime.portal.Portal;
+import com.esri.arcgisruntime.portal.PortalItem;
+import com.esri.arcgisruntime.portal.PortalItemType;
+import com.esri.arcgisruntime.portal.PortalQueryParams;
+import com.esri.arcgisruntime.portal.PortalUser;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -32,6 +49,8 @@ public class ControlsFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private View controlsView;
+    private PortalUser username;
+    private Portal portal;
 
     public ControlsFragment() {
         // Required empty public constructor
@@ -94,7 +113,8 @@ public class ControlsFragment extends Fragment {
         addDataButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "action not implemented", Toast.LENGTH_LONG).show();
+//                Toast.makeText(getContext(), "action not implemented", Toast.LENGTH_LONG).show();
+                searchForPortalItemType(PortalItemType.WEBMAP);
             }
         });
         //logic for show layer button
@@ -123,6 +143,102 @@ public class ControlsFragment extends Fragment {
         }
     }
 
+
+    private LinearLayout createControlsRecyclerView(){
+        LayoutInflater inflater=  (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        return  (LinearLayout) inflater.inflate(R.layout.constrols_recycler_view, (ViewGroup) getActivity().findViewById(R.id.nav_map_view));
+    }
+
+
+    /**
+     * factory method to show toast messages
+     *@param message
+     */
+
+    public void showMessage(String message){
+        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+
+    }
+
+
+    /**
+     * check for the presence of a feature service in user's portal
+     * and create a recycler view to populate with user's feature service
+     * @param itemType
+     * @return boolean isFeatureservice
+     */
+
+    public boolean searchForPortalItemType(PortalItemType itemType){
+        boolean isFeatureService = false;
+        //check to see if there is any web map already loaded in the map view
+        // then give user the option to select that one or edit a different one
+
+        MapView mapview = (MapView)getActivity().findViewById(R.id.nav_map_view);
+
+        Item item = mapview.getMap().getItem();
+        if(item instanceof PortalItem){
+            if(((PortalItem) item).getType() != PortalItemType.WEBMAP){
+                showMessage("No web map added to the map. \nPlease select one from your portal.");
+            }else{
+                return false;
+            }
+        }
+
+        final List<PortalItem> portalItem;
+        CardViewData cardViewData;
+        final CardViewAdapter cardViewAdapter;
+        portal = PortalViewFragment.portal;
+        username = portal.getPortalUser();
+
+        ArrayList<CardViewData> cardViewArrayList = new ArrayList<>();
+
+
+        try{
+        if(portal == null){
+            return false;
+        }else{
+
+            if(username != null) {
+                portalItem = portal.findItemsAsync(new PortalQueryParams("owner: " + portal.getPortalUser().getUserName())).get().getResults();
+                for (PortalItem portalItems : portalItem) {
+                    if (portalItems.getType() == itemType) {
+                        isFeatureService = true;
+                        byte[] cardByteArray = portalItems.fetchThumbnailAsync().get();
+                        if (cardByteArray != null) {
+                            cardViewData = new CardViewData(portalItems,
+                                    BitmapFactory.decodeByteArray(cardByteArray,
+                                            0, cardByteArray.length), null);
+                            cardViewArrayList.add(cardViewData);
+                        }
+                    }
+                }
+                cardViewAdapter = new CardViewAdapter(cardViewArrayList, null);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ProgressDialog progressDialog = ProgressDialog.show(getContext(),
+                                "Loading...", "Please wait while items loads");
+                        LinearLayout linearLayout = (LinearLayout) controlsView.findViewById(R.id.recycler_linear_layout);
+                        RecyclerView recyclerView = (RecyclerView) controlsView.findViewById(R.id.controls_recycler);
+                        recyclerView.setAdapter(cardViewAdapter);
+                        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+                        recyclerView.setLayoutManager(linearLayoutManager);
+                        linearLayout.setVisibility(View.VISIBLE);
+                        progressDialog.dismiss();
+                    }
+                });
+            }else{
+                Toast.makeText(getContext(), "No username associated with this portal", Toast.LENGTH_LONG).show();
+            }
+        }
+        }catch (ExecutionException|InterruptedException inexe){
+
+        }
+
+        return isFeatureService;
+
+    }
+
     @Override
     public void onHiddenChanged(boolean hidden){
         if(hidden){
@@ -148,16 +264,7 @@ public class ControlsFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);

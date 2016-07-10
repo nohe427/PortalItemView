@@ -53,7 +53,6 @@ public class PortalViewFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private View viewRecycler;
     private View view;
     private ArrayList<CardViewData> mCardViewData;
     private RecyclerView.Adapter mAdapter;
@@ -62,22 +61,14 @@ public class PortalViewFragment extends Fragment {
     private String username;
     private String password;
     private ProgressDialog progressDialog;
-
+    private boolean isPortalChecked;
+    private String portalURL;
     private OnFragmentInteractionListener mListener;
-
+    public static Portal portal;
     public PortalViewFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PortalViewFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static PortalViewFragment newInstance(String param1, String param2) {
         PortalViewFragment fragment = new PortalViewFragment();
         Bundle args = new Bundle();
@@ -100,13 +91,11 @@ public class PortalViewFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        viewRecycler = inflater.from(container.getContext()).inflate(R.layout.content_portal_view,container, false);
-        // Inflate the layout for this fragment
-       view =inflater.inflate(R.layout.portal_view_fragment, container, false);
-         return view;
+        //Inflate the layout for this fragment
+        view = inflater.inflate(R.layout.portal_view_fragment, container, false);
+        return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -120,7 +109,8 @@ public class PortalViewFragment extends Fragment {
             mListener = (OnFragmentInteractionListener) context;
             username = getArguments().getString("USERNAME");
             password = getArguments().getString("PASSWORD");
-
+            isPortalChecked = getArguments().getBoolean("isPortalChecked");
+            portalURL = getArguments().getString("portalURL");
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -134,28 +124,28 @@ public class PortalViewFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 
     public class PortalViewAsyncTask extends AsyncTask<Void, Void, Void> {
-        private Portal portal;
-        public PortalViewAsyncTask(){
+
+
+        public PortalViewAsyncTask() {
 
         }
 
-        private boolean activateItems(boolean activation){
+        private boolean activateItems(boolean activation) {
             NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
             MenuItem loginMenuItem = navigationView.getMenu().getItem(1);
-            if(activation)
+            if (activation)
                 loginMenuItem.setTitle("Log Out");
-            for(int i=0; i<navigationView.getMenu().size(); i++){
+            for (int i = 0; i < navigationView.getMenu().size(); i++) {
                 navigationView.getMenu().getItem(i).setEnabled(activation);
-               if(navigationView.getMenu().getItem(i).getTitle().toString().equalsIgnoreCase("ArcGIS Community")){
-                  for(int c=0; c < navigationView.getMenu().getItem(i).getSubMenu().size(); c++){
-                      navigationView.getMenu().getItem(i).getSubMenu().getItem(c).setEnabled(true);
-                  }
-               }
+                if (navigationView.getMenu().getItem(i).getTitle().toString().equalsIgnoreCase("ArcGIS Community")) {
+                    for (int c = 0; c < navigationView.getMenu().getItem(i).getSubMenu().size(); c++) {
+                        navigationView.getMenu().getItem(i).getSubMenu().getItem(c).setEnabled(true);
+                    }
+                }
 /*
                 if(navigationView.getMenu().getItem(i).getTitle().toString().equalsIgnoreCase("Configuration")){
                     for(int a=0; a < navigationView.getMenu().getItem(i).getSubMenu().size(); a++){
@@ -169,11 +159,14 @@ public class PortalViewFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... params) {
-            if(username == null && password == null){
+            if (username == null && password == null) {
                 return null;
             }
-
-            portal = new Portal("http://www.arcgis.com");
+            if (isPortalChecked) {
+                portal = new Portal(portalURL);
+            } else {
+                portal = new Portal("http://www.arcgis.com");
+            }
             portal.setCredential(new UserCredential(username, password));
             portal.loadAsync();
             portal.addDoneLoadingListener(new Runnable() {
@@ -186,24 +179,22 @@ public class PortalViewFragment extends Fragment {
                                 public void run() {
                                     try {
                                         progressDialog = ProgressDialog.show(getContext(), "Loading... ",
-                                                "Loading content from "+portal.getUri().toString(), true);
-                                        Snackbar.make(getActivity().findViewById(R.id.nav_map_view), "Portal loaded for "+
-                                        portal.getPortalUser().getFullName(), Snackbar.LENGTH_LONG).show();
+                                                "Loading content from " + portal.getUri().toString(), true);
+                                        Snackbar.make(getActivity().findViewById(R.id.nav_map_view), "Portal loaded for " +
+                                                portal.getPortalUser().getFullName(), Snackbar.LENGTH_LONG).show();
                                         TextView screen_name = (TextView) getActivity().findViewById(R.id.screen_name);
                                         screen_name.setText("Welcome " + portal.getPortalUser().getFullName());
                                         ImageView screenImage = (ImageView) getActivity().findViewById(R.id.screen_image);
                                         byte[] imgByte = portal.getPortalUser().fetchThumbnailAsync().get();
 
-                                        if(imgByte == null){
+                                        if (imgByte == null) {
                                             Snackbar.make(getActivity().findViewById(R.id.nav_view), "No thumbnail set for "
-                                            +portal.getPortalUser().getFullName(), Snackbar.LENGTH_LONG).show();
-                                        }else {
+                                                    + portal.getPortalUser().getFullName(), Snackbar.LENGTH_LONG).show();
+                                        } else {
                                             screenImage.setImageBitmap(BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length));
                                         }
-
-                                            activateItems(true);
-
-                                    }catch (ExecutionException | InterruptedException ex){
+                                        activateItems(true);
+                                    } catch (ExecutionException | InterruptedException ex) {
 
                                     }
                                 }
@@ -218,7 +209,8 @@ public class PortalViewFragment extends Fragment {
 
                             //provide your queries
                             PortalQueryParams portalQueryParams = new PortalQueryParams();
-                            portalQueryParams.setQuery("owner: "+portal.getPortalUser().getUserName());
+                            portalQueryParams.setQuery("owner: " + portal.getPortalUser().getUserName()+ "AND type: web map OR type: feature service");
+                            portalQueryParams.setLimit(100);
                             ListenableFuture<PortalQueryResultSet<PortalItem>> portalListItems =
                                     portal.findItemsAsync(portalQueryParams);//"owner: "+username
                             List<PortalItem> portalItems = portalListItems.get().getResults();
@@ -230,8 +222,8 @@ public class PortalViewFragment extends Fragment {
 
                                 if (data != null) {
                                     Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                    if(portalItem.getType() == PortalItemType.WEBMAP)
-                                    mCardViewData.add(new CardViewData(portalItem, bitmap, new ArcGISMap(portalItem)));
+                                    if (portalItem.getType() == PortalItemType.WEBMAP)
+                                        mCardViewData.add(new CardViewData(portalItem, bitmap, new ArcGISMap(portalItem)));
 
                                 }
                             }
@@ -244,21 +236,19 @@ public class PortalViewFragment extends Fragment {
                                     recyclerView.setLayoutManager(mLinearLayout);
                                     recyclerView.setAdapter(mAdapter);
                                     progressDialog.dismiss();
-
                                 }
                             });
 
 
-
-                        }else{
-                            if(portal.getLoadStatus() == LoadStatus.FAILED_TO_LOAD){
-                                Snackbar.make(getActivity().findViewById(R.id.nav_view), "The provided credentials not valid for "+
-                                portal.getUri(), Snackbar.LENGTH_LONG).show();
+                        } else {
+                            if (portal.getLoadStatus() == LoadStatus.FAILED_TO_LOAD) {
+                                Snackbar.make(getActivity().findViewById(R.id.nav_view), "The provided credentials not valid for " +
+                                        portal.getUri(), Snackbar.LENGTH_LONG).show();
                             }
-                }
-            } catch (ExecutionException | InterruptedException exception) {
-                Log.d("Exception", exception.getMessage());
-            }
+                        }
+                    } catch (ExecutionException | InterruptedException exception) {
+                        Log.d("Exception", exception.getMessage());
+                    }
                 }
             });
 
@@ -267,12 +257,12 @@ public class PortalViewFragment extends Fragment {
         }
 
         @Override
-        protected void onPreExecute(){
+        protected void onPreExecute() {
 
         }
 
         @Override
-        protected void onPostExecute(Void result){
+        protected void onPostExecute(Void result) {
 
         }
     }

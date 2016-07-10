@@ -49,4 +49,9 @@
     <string name="total_distance">Total Distance</string>
     <string name="route_image_desc">route turn description</string>
     <string name="switch_text">Voice Guidance</string>
+    <string name="anonymous_access">Use without signing in to a portal</string>
+    <string name="latitude">latitude</string>
+    <string name="longitude">longitude</string>
+    <string name="feature_found">feature_found</string>
+    <string name="direction_option">direction option</string>
 </resources>
