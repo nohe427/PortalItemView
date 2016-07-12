@@ -325,6 +325,7 @@ public class ControlsFragment extends Fragment {
                     public void run() {
                         ProgressDialog progressDialog = ProgressDialog.show(controlsView.getContext(),
                                 "Loading...", "Please wait while items loads");
+                        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                         LinearLayout linearLayout = (LinearLayout) controlsView.findViewById(R.id.recycler_linear_layout);
                         RecyclerView recyclerView = (RecyclerView) controlsView.findViewById(R.id.controls_recycler);
                         recyclerView.setAdapter(cardViewAdapter);
