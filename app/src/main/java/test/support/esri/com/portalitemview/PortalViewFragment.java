@@ -146,12 +146,6 @@ public class PortalViewFragment extends Fragment {
                         navigationView.getMenu().getItem(i).getSubMenu().getItem(c).setEnabled(true);
                     }
                 }
-/*
-                if(navigationView.getMenu().getItem(i).getTitle().toString().equalsIgnoreCase("Configuration")){
-                    for(int a=0; a < navigationView.getMenu().getItem(i).getSubMenu().size(); a++){
-                        navigationView.getMenu().getItem(i).getSubMenu().getItem(a).setEnabled(true);
-                    }
-                }*/
             }
             return activation;
         }
@@ -209,7 +203,7 @@ public class PortalViewFragment extends Fragment {
 
                             //provide your queries
                             PortalQueryParams portalQueryParams = new PortalQueryParams();
-                            portalQueryParams.setQuery("owner: " + portal.getPortalUser().getUserName()+ "AND type: web map OR type: feature service");
+                            portalQueryParams.setQuery("owner: " + portal.getPortalUser().getUserName() +" AND type: web map");
                             portalQueryParams.setLimit(100);
                             ListenableFuture<PortalQueryResultSet<PortalItem>> portalListItems =
                                     portal.findItemsAsync(portalQueryParams);//"owner: "+username
@@ -236,6 +230,7 @@ public class PortalViewFragment extends Fragment {
                                     recyclerView.setLayoutManager(mLinearLayout);
                                     recyclerView.setAdapter(mAdapter);
                                     progressDialog.dismiss();
+                                    
                                 }
                             });
 
