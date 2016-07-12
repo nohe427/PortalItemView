@@ -143,7 +143,8 @@ public class AnonymousPortalFragment extends Fragment {
                                         @Override
                                         public void run() {
                                             try {
-                                            progressDialog = ProgressDialog.show(getContext(), "Loading...", "Loading portal contents for anonymous user", true);
+                                            progressDialog = ProgressDialog.show(anonymousPortalLayoutView.getContext(), "Loading...", "Loading portal contents for anonymous user", true);
+                                                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                                             PortalQueryParams portalQueryparams = new PortalQueryParams();
                                             portalQueryparams.setQuery("group: c755678be14e4a0984af36a15f5b643e OR group: b8787a74b4d74f7fb9b8fac918735153 and " +
                                                     "type: web map");
