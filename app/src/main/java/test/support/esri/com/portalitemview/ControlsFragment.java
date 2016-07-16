@@ -91,6 +91,8 @@ public class ControlsFragment extends Fragment {
     private Point whereTappedPoint;
     private SimpleMarkerSymbol simpleMarkerSym;
     private GeodatabaseFeatureTable geodatabaseFeatureTable = null;
+    private  ControlsViewOnTouchListener controlModeListener;
+    private PortalViewMain.MapViewSingleClick mapViewSingleClick  = PortalViewMain.singleClick;
 
 
     public ControlsFragment() {
@@ -132,9 +134,9 @@ public class ControlsFragment extends Fragment {
 
         //create and register event
         mapView = (MapView) getActivity().findViewById(R.id.nav_map_view);
-        ControlsViewOnTouchListener controlModeListener = new ControlsViewOnTouchListener(getContext(), mapView);
+        controlModeListener = new ControlsViewOnTouchListener(getContext(), mapView);
         mapView.setOnTouchListener(controlModeListener);
-        mapView.setOnTouchListener();
+
 
         //Close action buttons view
         Button closeFloatButton = (Button) controlsView.findViewById(R.id.float_close_button);
@@ -144,6 +146,8 @@ public class ControlsFragment extends Fragment {
                 getActivity().getSupportFragmentManager().beginTransaction().hide(
                         getFragmentManager().findFragmentByTag("ControlsFrag")
                 ).commit();
+
+                mapView.setOnTouchListener(mapViewSingleClick);
             }
         });
 

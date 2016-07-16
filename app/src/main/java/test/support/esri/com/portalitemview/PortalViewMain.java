@@ -188,7 +188,7 @@ public class PortalViewMain extends AppCompatActivity
 
 
     //inner class for extending single tap
-    private class MapViewSingleClick extends DefaultMapViewOnTouchListener {
+    public class MapViewSingleClick extends DefaultMapViewOnTouchListener {
 
         public MapViewSingleClick(Context context, MapView mapView) {
             super(context, mapView);
