@@ -203,10 +203,10 @@ public class PortalViewFragment extends Fragment {
 
                             //provide your queries
                             PortalQueryParams portalQueryParams = new PortalQueryParams();
-                            portalQueryParams.setQuery("owner: " + portal.getPortalUser().getUserName() +" AND type: web map");
+                            portalQueryParams.setQuery("owner: " + portal.getPortalUser().getUserName());
                             portalQueryParams.setLimit(100);
                             ListenableFuture<PortalQueryResultSet<PortalItem>> portalListItems =
-                                    portal.findItemsAsync(portalQueryParams);//"owner: "+username
+                                    portal.findItemsAsync(portalQueryParams);
                             List<PortalItem> portalItems = portalListItems.get().getResults();
                             for (PortalItem portalItem : portalItems) {
                                 byte[] data = portalItem.fetchThumbnailAsync().get();

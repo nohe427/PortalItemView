@@ -33,7 +33,7 @@
         app:backgroundTint="@android:color/transparent" />
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/add_data"
-        android:src="@drawable/add_data"
+        android:src="@drawable/gdb_download"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:useCompatPadding="true"
@@ -47,6 +47,7 @@
         android:src="@drawable/edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="visible"
         app:useCompatPadding="true"
         app:fabSize="mini"
         app:backgroundTintMode="src_atop"
@@ -54,14 +55,27 @@
         android:layout_alignParentBottom="true"
         android:layout_toStartOf="@+id/add_data" />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/sync_data"
+        android:src="@drawable/gdb_synchronize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:useCompatPadding="true"
+        app:fabSize="mini"
+        app:backgroundTintMode="src_atop"
+        app:backgroundTint="@android:color/transparent"
+        android:layout_alignTop="@+id/edit_data"
+        android:layout_toStartOf="@+id/edit_data" />
+
     <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:text="x"
         android:id="@+id/float_close_button"
-        android:layout_above="@+id/edit_data"
-        android:layout_toStartOf="@+id/edit_data"
-        android:textSize="8dp" />
+        android:textSize="8dp"
+        android:layout_above="@+id/sync_data"
+        android:layout_alignStart="@+id/sync_data" />
 
 </RelativeLayout>

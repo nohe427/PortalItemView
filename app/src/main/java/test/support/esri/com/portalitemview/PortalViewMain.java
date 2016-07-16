@@ -70,7 +70,7 @@ public class PortalViewMain extends AppCompatActivity
     private Callout callout;
     private SearchView searchView;
     private RelativeLayout relativeLayout;
-
+    public static MapViewSingleClick singleClick;
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +105,7 @@ public class PortalViewMain extends AppCompatActivity
         callout.setShowOptions(showOptions);
         callout.setStyle(style);
 
-        MapViewSingleClick singleClick = new MapViewSingleClick(getApplicationContext(), navMapView);
+        singleClick = new MapViewSingleClick(getApplicationContext(), navMapView);
         navMapView.setOnTouchListener(singleClick);
 
 
