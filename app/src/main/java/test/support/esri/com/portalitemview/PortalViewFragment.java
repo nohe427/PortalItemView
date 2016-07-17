@@ -65,6 +65,7 @@ public class PortalViewFragment extends Fragment {
     private String portalURL;
     private OnFragmentInteractionListener mListener;
     public static Portal portal;
+    private NavigationView navigationView;
     public PortalViewFragment() {
         // Required empty public constructor
     }
@@ -135,7 +136,7 @@ public class PortalViewFragment extends Fragment {
         }
 
         private boolean activateItems(boolean activation) {
-            NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+            navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
             MenuItem loginMenuItem = navigationView.getMenu().getItem(1);
             if (activation)
                 loginMenuItem.setTitle("Log Out");
@@ -239,6 +240,8 @@ public class PortalViewFragment extends Fragment {
                             if (portal.getLoadStatus() == LoadStatus.FAILED_TO_LOAD) {
                                 Snackbar.make(getActivity().findViewById(R.id.nav_view), "The provided credentials not valid for " +
                                         portal.getUri(), Snackbar.LENGTH_LONG).show();
+                                   NavigationView navView = (NavigationView)getActivity().findViewById(R.id.nav_view);
+                                    navView.getMenu().getItem(1).setEnabled(true);
                             }
                         }
                     } catch (ExecutionException | InterruptedException exception) {

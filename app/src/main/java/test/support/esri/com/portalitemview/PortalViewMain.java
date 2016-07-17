@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -47,10 +48,14 @@ import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
 import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.portal.Portal;
+import com.esri.arcgisruntime.security.CredentialChangedEvent;
+import com.esri.arcgisruntime.security.CredentialChangedListener;
+import com.esri.arcgisruntime.security.UserCredential;
 import com.esri.arcgisruntime.symbology.PictureMarkerSymbol;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class PortalViewMain extends AppCompatActivity
@@ -206,6 +211,12 @@ public class PortalViewMain extends AppCompatActivity
             callout.show();
             return true;
         }
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY){
+            callout.dismiss();
+            return true;
+        }
     }
 
 
@@ -342,16 +353,41 @@ public class PortalViewMain extends AppCompatActivity
 
         if (id == R.id.nav_login) {
             // Handle the log in action
+            List<Fragment> fragments = getSupportFragmentManager().getFragments();
             if (item.getTitle().toString().equalsIgnoreCase("Log in to Portal")) {
-                fragmentManager = getSupportFragmentManager();
-                fragmentTransaction = fragmentManager.beginTransaction();
-                LogInFragment logInFragment = new LogInFragment();
-                fragmentTransaction.add(R.id.nav_map_view, logInFragment, "login_frag").commit();
+                for(int i=0; i < fragments.size(); i++){
+                    getSupportFragmentManager().beginTransaction().remove(fragments.get(i)).commit();
+                }
+                finish();
+               startActivity(new Intent(getApplicationContext(), Launcher.class));
 
             }
 
             //implement logic to log out of portal
             if (item.getTitle().toString().equalsIgnoreCase("Log out")) {
+                int i =0;
+                while(i < fragments.size()){
+                    getSupportFragmentManager().beginTransaction()
+                            .remove(fragments.get(i)).commit();
+                    i++;
+                }
+
+                final Intent logoutIntent = new Intent(getApplicationContext(), Launcher.class);
+                portal.setCredential(new UserCredential("null", "null"));
+                portal.loadAsync();
+                portal.addCredentialChangedListener(new CredentialChangedListener() {
+                    @Override
+                    public void credentialChanged(CredentialChangedEvent credentialChangedEvent) {
+                            showMessage("Logging out of portal.");
+                    }
+                });
+                portal.addDoneLoadingListener(new Runnable() {
+                    @Override
+                    public void run() {
+                        finish();
+                        startActivity(logoutIntent);
+                    }
+                });
 
             }
 

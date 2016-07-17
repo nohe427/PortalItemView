@@ -50,20 +50,19 @@ import com.esri.arcgisruntime.tasks.geodatabase.GenerateGeodatabaseJob;
 import com.esri.arcgisruntime.tasks.geodatabase.GenerateGeodatabaseParameters;
 import com.esri.arcgisruntime.tasks.geodatabase.GenerateLayerOption;
 import com.esri.arcgisruntime.tasks.geodatabase.GeodatabaseSyncTask;
+import com.esri.arcgisruntime.tasks.geodatabase.SyncGeodatabaseJob;
+import com.esri.arcgisruntime.tasks.geodatabase.SyncGeodatabaseParameters;
+import com.esri.arcgisruntime.tasks.geodatabase.SyncLayerOption;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ControlsFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ControlsFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Controls fragments for offline editing functionality and
+ * toggle functionality for showing loaded portal items
+ *
  */
 public class ControlsFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
@@ -92,7 +91,11 @@ public class ControlsFragment extends Fragment {
     private SimpleMarkerSymbol simpleMarkerSym;
     private GeodatabaseFeatureTable geodatabaseFeatureTable = null;
     private  ControlsViewOnTouchListener controlModeListener;
+    private GeodatabaseSyncTask geodatabaseSyncTask;
     private PortalViewMain.MapViewSingleClick mapViewSingleClick  = PortalViewMain.singleClick;
+    
+    private SyncGeodatabaseJob syncGdbJob;
+    private ProgressDialog progressD;
 
 
     public ControlsFragment() {
@@ -131,6 +134,9 @@ public class ControlsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         controlsView = inflater.inflate(R.layout.fragment_controls, container, false);
+        
+        //instantiate progress dialog with fragment's context
+        progressD = new ProgressDialog(getContext());
 
         //create and register event
         mapView = (MapView) getActivity().findViewById(R.id.nav_map_view);
@@ -146,7 +152,6 @@ public class ControlsFragment extends Fragment {
                 getActivity().getSupportFragmentManager().beginTransaction().hide(
                         getFragmentManager().findFragmentByTag("ControlsFrag")
                 ).commit();
-
                 mapView.setOnTouchListener(mapViewSingleClick);
             }
         });
@@ -168,6 +173,16 @@ public class ControlsFragment extends Fragment {
                 createWebMap(PortalItemType.WEBMAP);
             }
         });
+
+        //wire click to the sync button
+        FloatingActionButton syncDataButton = (FloatingActionButton)controlsView.findViewById(R.id.sync_data);
+        syncDataButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new ControlsSyncAsync().execute();
+            }
+        });
+
         //logic for show layer button
         FloatingActionButton showLayerButton = (FloatingActionButton) controlsView.findViewById(R.id.show_layers);
         showLayerButton.setOnClickListener(new View.OnClickListener() {
@@ -215,7 +230,7 @@ public class ControlsFragment extends Fragment {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        final ProgressDialog progressD = new ProgressDialog(getContext());
+
                        /*progressD.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                        progressD.setTitle("Loading...");
                        progressD.setMessage("Attempting to add feature layer to map.");*/
@@ -235,7 +250,7 @@ public class ControlsFragment extends Fragment {
                                     mapView.setViewpointAsync(viewPoint);
 //                                   progressD.dismiss();
                                     showMessage("Feature layer " + featureLayer.getName() + " successfully loaded and added to the map.");
-                                    GeodatabaseSyncTask geodatabaseSyncTask = new GeodatabaseSyncTask(getContext(), "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/RuntimeServices/OfflineFeatureService/FeatureServer");
+                                    geodatabaseSyncTask = new GeodatabaseSyncTask(getContext(), "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/RuntimeServices/OfflineFeatureService/FeatureServer");
                                     GenerateGeodatabaseParameters generateGeodatabaseParameters = new GenerateGeodatabaseParameters();
                                     generateGeodatabaseParameters.setExtent(envelope);
                                     generateGeodatabaseParameters.setOutSpatialReference(SpatialReference.create(4269));
@@ -300,32 +315,48 @@ public class ControlsFragment extends Fragment {
 
                 });
 
-
-
-
-
-
-        /*SyncGeodatabaseParameters syncGeodatabaseParameters = new SyncGeodatabaseParameters();
-        syncGeodatabaseParameters.setRollbackOnFailure(true);
-        syncGeodatabaseParameters.setSyncDirection(SyncGeodatabaseParameters.SyncDirection.BIDIRECTIONAL);
-        SyncLayerOption syncLayerOption = new SyncLayerOption(0);
-        syncLayerOption.setSyncDirection(SyncGeodatabaseParameters.SyncDirection.BIDIRECTIONAL);
-        syncGeodatabaseParameters.getLayerOptions().add(syncLayerOption);
-        geodatabaseSyncTask.syncGeodatabaseAsync(syncGeodatabaseParameters)*/
-                //read it into a json
-                //read the json into a
-
-//            Geodatabase geodatabase = new Geodatabase(Environment.getExternalStorageDirectory().getPath() +"//test.geodatabase");
-
-
             }
             return null;
         }
     }
 
-    private LinearLayout createControlsRecyclerView() {
-        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        return (LinearLayout) inflater.inflate(R.layout.constrols_recycler_view, (ViewGroup) getActivity().findViewById(R.id.nav_map_view));
+    private class ControlsSyncAsync extends AsyncTask<Void, Void, Void>{
+
+        @Override
+        protected Void doInBackground(Void... params) {
+                SyncGeodatabaseParameters syncGeodatabaseParameters = new SyncGeodatabaseParameters();
+                syncGeodatabaseParameters.setRollbackOnFailure(true);
+                syncGeodatabaseParameters.setSyncDirection(SyncGeodatabaseParameters.SyncDirection.BIDIRECTIONAL);
+                SyncLayerOption syncLayerOption = new SyncLayerOption(0);
+                syncLayerOption.setSyncDirection(SyncGeodatabaseParameters.SyncDirection.BIDIRECTIONAL);
+                syncGeodatabaseParameters.getLayerOptions().add(syncLayerOption);
+                syncGdbJob = geodatabaseSyncTask.syncGeodatabaseAsync(syncGeodatabaseParameters, geodatabase);
+                syncGdbJob.start();
+                final List<Job.Message> messages = syncGdbJob.getMessages();
+                progressD.setTitle("Synchronizing geodatabase...");
+                progressD.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                progressD.show();
+                syncGdbJob.addJobChangedListener(new Runnable() {
+                    @Override
+                    public void run() {
+                        for(Job.Message message : messages){
+                            progressD.setMessage(message.getMessage());
+                        }
+                    }
+                });
+
+               syncGdbJob.addJobDoneListener(new Runnable() {
+                   @Override
+                   public void run() {
+                       if(syncGdbJob.getStatus() == Job.Status.SUCCEEDED){
+                           showMessage("Offline edits synchronized successfully");
+                           progressD.dismiss();
+                       }
+                   }
+               });
+            return  null;
+
+        }
     }
 
 
@@ -334,27 +365,11 @@ public class ControlsFragment extends Fragment {
             geodatabase.loadAsync();
            geodatabaseFeatureTable = geodatabase.getGeodatabaseFeatureTableByServiceLayerId(0);
             geodatabaseFeatureTable.loadAsync();
-           /* //TODO:to be implemented later to allow for editing specific to geometry type
-            GeometryType geometryType = geodatabaseFeatureTable.getGeometryType();
-            String geometryTypeName;
-            //switch on geometry type
-            switch(geometryType){
-                case POINT:geometryTypeName = "Point";
-
-                    break;
-                case POLYGON:geometryTypeName = "Polygon";
-                    break;
-                case POLYLINE:geometryTypeName = "Polyline";
-                    break;
-                default:geometryTypeName = "Point";
-            } //end of TODO*/
 
             if(geodatabaseFeatureTable == null){
                 showMessage("Could not detect the table with the specified id. \n Please try again.");
                 return;
             }
-
-
             geodatabaseFeatureTable.addDoneLoadingListener(new Runnable() {
                 @Override
                 public void run() {
@@ -362,11 +377,8 @@ public class ControlsFragment extends Fragment {
                     if(status == LoadStatus.LOADED){
                         showMessage("offline gdb successfully loaded!");
                     }
-
-
                 }
             });
-
             controlsView.findViewById(R.id.sync_data).setVisibility(View.VISIBLE);
         }
     }
@@ -386,15 +398,11 @@ public class ControlsFragment extends Fragment {
             graphicsOverlay = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
             simpleMarkerSym = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.BLUE, 16);
             graphic = new Graphic(whereTappedPoint);
-//            feature = geodatabaseFeatureTable.createFeature();
-  //          feature.setGeometry(whereTappedPoint);
-            //dummy graphic to show to user
 
             graphic.setSymbol(simpleMarkerSym);
             graphicsOverlay.getGraphics().add(graphic);
             mapView.getGraphicsOverlays().add(graphicsOverlay);
 
-    //        geodatabaseFeatureTable.addFeatureAsync(feature);
             return true;
         }
 

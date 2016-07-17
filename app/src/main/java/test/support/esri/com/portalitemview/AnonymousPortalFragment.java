@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,6 +41,8 @@ public class AnonymousPortalFragment extends Fragment {
     private View anonymousPortalLayoutView;
     private ProgressDialog progressDialog;
     public ArrayList<CardViewData> mCardViewData;
+    private NavigationView navigationMenu;
+    private Portal portal;
 
     public AnonymousPortalFragment() {
         // Required empty public constructor
@@ -70,6 +73,7 @@ public class AnonymousPortalFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         anonymousPortalLayoutView = inflater.from(getContext()).inflate(R.layout.fragment_anonymous_portal, container, false);
+        navigationMenu = (NavigationView)getActivity().findViewById(R.id.nav_view);
         return anonymousPortalLayoutView;
     }
 
@@ -97,16 +101,7 @@ public class AnonymousPortalFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
@@ -117,63 +112,69 @@ public class AnonymousPortalFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... params) {
-            final Portal portal = new Portal("http://www.arcgis.com");
+            portal = new Portal("http://www.arcgis.com");
             portal.setCredential(new UserCredential("mrasante", "applegoe"));
             portal.loadAsync();
             portal.addDoneLoadingListener(new Runnable() {
                 @Override
                 public void run() {
-
                     if (portal.getLoadStatus() == LoadStatus.LOADED) {
                         mCardViewData = new ArrayList<>();
                         getActivity().runOnUiThread(new Runnable() {
 
                             @Override
                             public void run() {
-
-
-                                    Snackbar.make(getActivity().findViewById(R.id.nav_map_view),
-                                            portal.getUri() + " loaded for anonymous public user.", Snackbar.LENGTH_LONG
-                                    ).show();
-                                    TextView screen_name = (TextView) getActivity().findViewById(R.id.screen_name);
-                                    screen_name.setText("Anonymous User");
-
-
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            try {
-                                            progressDialog = ProgressDialog.show(anonymousPortalLayoutView.getContext(), "Loading...", "Loading portal contents for anonymous user", true);
-                                                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                                            PortalQueryParams portalQueryparams = new PortalQueryParams();
-                                            portalQueryparams.setQuery("group: c755678be14e4a0984af36a15f5b643e OR group: b8787a74b4d74f7fb9b8fac918735153 and " +
-                                                    "type: web map");
-                                            portalQueryparams.setLimit(100);
-                                            PortalQueryResultSet<PortalItem> portalQueryResults = portal.findItemsAsync(portalQueryparams).get();
-                                            List<PortalItem> portalItems = portalQueryResults.getResults();
-                                            for(PortalItem portalItem : portalItems){
-                                                byte[] byteData = portalItem.fetchThumbnailAsync().get();
-                                                if(byteData != null) {
-                                                    mCardViewData.add(new CardViewData(portalItem,
-                                                            BitmapFactory.decodeByteArray(byteData, 0,
-                                                                    byteData.length), null));
-                                                }
-                                            }
-                                        } catch (InterruptedException | ExecutionException inexe) {
-
-                                        }
-                                            CardViewAdapter anonAdapter = new CardViewAdapter(mCardViewData, getActivity().getSupportFragmentManager());
-                                            RecyclerView anonRecyclerView = (RecyclerView)getActivity().findViewById(R.id.anonymous_recycler_view);
-                                            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-                                            anonRecyclerView.setAdapter(anonAdapter);
-                                            anonRecyclerView.setLayoutManager(linearLayoutManager);
-                                           progressDialog.dismiss();
-                                        }
-                                    });
-
-
+                                progressDialog = new ProgressDialog(getContext());
+                                progressDialog.setTitle("Please wait...");
+                                progressDialog.setMessage("Loading portal contents for anonymous user.");
+                                progressDialog.setIndeterminate(true);
+                                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                                progressDialog.show();
+                                Snackbar.make(getActivity().findViewById(R.id.nav_map_view),
+                                        portal.getUri() + " loaded for anonymous public user.", Snackbar.LENGTH_LONG
+                                ).show();
+                                TextView screen_name = (TextView) getActivity().findViewById(R.id.screen_name);
+                                screen_name.setText("Anonymous User");
                             }
                         });
+                                try {
+
+                                    PortalQueryParams portalQueryparams = new PortalQueryParams();
+                                    portalQueryparams.setQuery("group: c755678be14e4a0984af36a15f5b643e OR group: b8787a74b4d74f7fb9b8fac918735153 and " +
+                                            "type: web map");
+                                    portalQueryparams.setLimit(200);
+                                    PortalQueryResultSet<PortalItem> portalQueryResults = portal.findItemsAsync(portalQueryparams).get();
+                                    List<PortalItem> portalItems = portalQueryResults.getResults();
+                                    for(PortalItem portalItem : portalItems){
+                                        byte[] byteData = portalItem.fetchThumbnailAsync().get();
+                                        if(byteData != null) {
+                                            mCardViewData.add(new CardViewData(portalItem,
+                                                    BitmapFactory.decodeByteArray(byteData, 0,
+                                                            byteData.length), null));
+                                        }
+                                    }
+                                } catch (InterruptedException | ExecutionException inexe) {
+
+                                }
+
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    CardViewAdapter anonAdapter = new CardViewAdapter(mCardViewData, getActivity().getSupportFragmentManager());
+                                    RecyclerView anonRecyclerView = (RecyclerView)getActivity().findViewById(R.id.anonymous_recycler_view);
+                                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+                                    anonRecyclerView.setAdapter(anonAdapter);
+                                    anonRecyclerView.setLayoutManager(linearLayoutManager);
+                                progressDialog.dismiss();
+                                    //give the user the option to log in
+                                    navigationMenu.getMenu().getItem(1).setEnabled(true);
+                                }
+                            });
+
+
+
+
+
                     }
 
                 }
