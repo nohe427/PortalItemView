@@ -5,9 +5,8 @@ import android.annotation.TargetApi;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,7 +32,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.esri.arcgisruntime.geometry.Point;
-import com.esri.arcgisruntime.geometry.SpatialReference;
 import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.Basemap;
@@ -43,15 +41,12 @@ import com.esri.arcgisruntime.mapping.view.DefaultMapViewOnTouchListener;
 import com.esri.arcgisruntime.mapping.view.DrawStatus;
 import com.esri.arcgisruntime.mapping.view.DrawStatusChangedEvent;
 import com.esri.arcgisruntime.mapping.view.DrawStatusChangedListener;
-import com.esri.arcgisruntime.mapping.view.Graphic;
-import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
 import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.portal.Portal;
 import com.esri.arcgisruntime.security.CredentialChangedEvent;
 import com.esri.arcgisruntime.security.CredentialChangedListener;
 import com.esri.arcgisruntime.security.UserCredential;
-import com.esri.arcgisruntime.symbology.PictureMarkerSymbol;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -81,6 +76,7 @@ public class PortalViewMain extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigator);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         navMapView = (MapView) findViewById(R.id.nav_map_view);
@@ -124,9 +120,7 @@ public class PortalViewMain extends AppCompatActivity
 
         for (int i = 1; i < navigationView.getMenu().size(); i++) {
             menuTitle = navigationView.getMenu().getItem(i).getTitle().toString();
-            if (!menuTitle.equalsIgnoreCase("3D Maps")) {
-                navigationView.getMenu().getItem(i).setEnabled(false);
-            }
+
             if (menuTitle.equalsIgnoreCase("ArcGIS Community")) {
                 portal = new Portal("https://www.arcgis.com");
 
@@ -183,8 +177,30 @@ public class PortalViewMain extends AppCompatActivity
         } else {
             performArcGISOnlineQuery();
         }
+
+
+
     }
 
+
+  /*  @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(requestCode == 1){
+            if(resultCode == Activity.RESULT_OK){
+                double[] pointArray = data.getDoubleArrayExtra("point");
+                SimpleMarkerSymbol geocodeMarkerSym = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CROSS,
+                        Color.RED, 16);
+                int spInt = new Double(pointArray[3]).intValue();
+                Point point = new Point(pointArray[0], pointArray[1],
+                        SpatialReference.create(spInt));
+                Graphic geocodedPointGraphic = new Graphic(point, geocodeMarkerSym);
+                GraphicsOverlay graphicsOverlay = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
+                graphicsOverlay.getGraphics().add(geocodedPointGraphic);
+                navMapView.getGraphicsOverlays().add(graphicsOverlay);
+                navMapView.setViewpointCenterWithScaleAsync(point, 100);
+            }
+        }
+    }*/
 
     //public static method to return map
     public static ArcGISMap getCurrentMap() {
@@ -221,6 +237,8 @@ public class PortalViewMain extends AppCompatActivity
 
 
 
+
+
     public void performArcGISOnlineQuery() {
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -233,19 +251,7 @@ public class PortalViewMain extends AppCompatActivity
                 .addToBackStack("recycler_transaction")
                 .commit();
 
-        //if the activity is started by the geocode activity
-        double[] doubleArray = getIntent().getDoubleArrayExtra("point");
-        if (doubleArray != null) {
-            Point point = new Point(doubleArray[0], doubleArray[1],
-                    SpatialReference.create(new Double(doubleArray[2]).intValue()));
-            PictureMarkerSymbol geocodeMarkerSym = new PictureMarkerSymbol(new BitmapDrawable(getResources(),
-                    BitmapFactory.decodeResource(getResources(), R.drawable.geolocation)));
-            Graphic geocodedPointGraphic = new Graphic(point, geocodeMarkerSym);
-            GraphicsOverlay graphicsOverlay = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
-            graphicsOverlay.getGraphics().add(geocodedPointGraphic);
-            navMapView.getGraphicsOverlays().add(graphicsOverlay);
-            navMapView.setViewpointCenterWithScaleAsync(point, 100);
-        }
+
     }
 
     @Override
@@ -256,6 +262,7 @@ public class PortalViewMain extends AppCompatActivity
                 navigationView.getMenu().getItem(n).getSubMenu().getItem(n).setEnabled(true);
             }
         }
+
     }
 
     @Override

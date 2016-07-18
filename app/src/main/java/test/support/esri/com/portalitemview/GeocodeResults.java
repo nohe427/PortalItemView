@@ -1,13 +1,12 @@
 package test.support.esri.com.portalitemview;
 
-import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
 import com.esri.arcgisruntime.geometry.Point;
@@ -20,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class GeocodeResults extends Activity {
+public class GeocodeResults extends AppCompatActivity {
 
 
     private GeocodeAdapter geocodeAdapter;
@@ -57,6 +56,7 @@ public class GeocodeResults extends Activity {
                 final LocatorTask locatorTask = new LocatorTask("http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer");
                 locatorTask.loadAsync();
                 final GeocodeParameters geocodeParameters = new GeocodeParameters();
+                geocodeParameters.setMaxResults(5);
                /* geocodeParameters.setSearchArea(new Envelope(-9555926.059, 5614076.887,-12707563.406,3054635.375,
                         SpatialReference.create(3857)));*/
                 locatorTask.addDoneLoadingListener(new Runnable() {
@@ -82,13 +82,13 @@ public class GeocodeResults extends Activity {
                                         geocodeAdapter = new GeocodeAdapter(geocodeAdapterData);
                                         recyclerView = (RecyclerView)findViewById(R.id.geocode_recycler);
                                         linearLayoutManager = new LinearLayoutManager(GeocodeResults.this);
+                                        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                                        linearLayoutManager.setSmoothScrollbarEnabled(true);
                                         recyclerView.setLayoutManager(linearLayoutManager);
                                         recyclerView.setAdapter(geocodeAdapter);
                                     }
                                 });
-                                Log.d("KwasiD", "Just checking");
                             } catch (InterruptedException | ExecutionException ine) {
-                                Log.d("KwasiD", ine.getMessage());
                             }
 
                         }

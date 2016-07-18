@@ -54,4 +54,5 @@
     <string name="longitude">longitude</string>
     <string name="feature_found">feature_found</string>
     <string name="direction_option">direction option</string>
+    <string name="title_activity_geocode">GeocodeActivity</string>
 </resources>

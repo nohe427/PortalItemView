@@ -31,7 +31,6 @@ import com.esri.arcgisruntime.datasource.arcgis.ServiceFeatureTable;
 import com.esri.arcgisruntime.datasource.arcgis.SyncModel;
 import com.esri.arcgisruntime.geometry.Envelope;
 import com.esri.arcgisruntime.geometry.Point;
-import com.esri.arcgisruntime.geometry.SpatialReference;
 import com.esri.arcgisruntime.layers.FeatureLayer;
 import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.mapping.Item;
@@ -78,7 +77,6 @@ public class ControlsFragment extends Fragment {
     private View controlsView;
     private PortalUser username;
     private Portal portal;
-    private String JSONFileLocation = "\\res\\raw\\airport.json";//getContext().getResources().getResourceTypeName(R.raw.airport);
     private Geodatabase geodatabase;
 
     private MapView mapView;
@@ -96,20 +94,15 @@ public class ControlsFragment extends Fragment {
     
     private SyncGeodatabaseJob syncGdbJob;
     private ProgressDialog progressD;
+    private FeatureLayer featureLayer;
+
 
 
     public ControlsFragment() {
-        // Required empty public constructor
+        //Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ControlsFragment.
-     */
+
     // TODO: Rename and change types and number of parameters
     public static ControlsFragment newInstance(String param1, String param2) {
         ControlsFragment fragment = new ControlsFragment();
@@ -210,7 +203,7 @@ public class ControlsFragment extends Fragment {
     }
 
 
-    public class ControlsFragAsync extends AsyncTask<Void, Void, Void> {
+    public class ControlsAddDataAsync extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -230,13 +223,8 @@ public class ControlsFragment extends Fragment {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
-                       /*progressD.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                       progressD.setTitle("Loading...");
-                       progressD.setMessage("Attempting to add feature layer to map.");*/
-
-                        final FeatureLayer featureLayer = new FeatureLayer(new ServiceFeatureTable(
-                                "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/RuntimeServices/OfflineFeatureService/FeatureServer/0"
+                        featureLayer = new FeatureLayer(new ServiceFeatureTable(
+                                "http://sampleserver5.arcgisonline.com/arcgis/rest/services/Sync/WildfireSync/FeatureServer/0"
                         ));
                         featureLayer.loadAsync();
                         featureLayer.addDoneLoadingListener(new Runnable() {
@@ -245,74 +233,15 @@ public class ControlsFragment extends Fragment {
                                 if (featureLayer.getLoadStatus() == LoadStatus.LOADED) {
                                     mapView.getMap().getOperationalLayers().add(featureLayer);
                                     extent = featureLayer.getFullExtent();
-                                    Envelope envelope = new Envelope(-150.654, -45.157, 100.58, 75.46, SpatialReference.create(4269));
-                                    Viewpoint viewPoint = new Viewpoint(envelope);
+//                                    Envelope envelope = new Envelope(-150.654, -45.157, 100.58, 75.46, SpatialReference.create(4269));
+                                    Viewpoint viewPoint = new Viewpoint(extent);
                                     mapView.setViewpointAsync(viewPoint);
-//                                   progressD.dismiss();
                                     showMessage("Feature layer " + featureLayer.getName() + " successfully loaded and added to the map.");
-                                    geodatabaseSyncTask = new GeodatabaseSyncTask(getContext(), "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/RuntimeServices/OfflineFeatureService/FeatureServer");
-                                    GenerateGeodatabaseParameters generateGeodatabaseParameters = new GenerateGeodatabaseParameters();
-                                    generateGeodatabaseParameters.setExtent(envelope);
-                                    generateGeodatabaseParameters.setOutSpatialReference(SpatialReference.create(4269));
-                                    generateGeodatabaseParameters.setSyncModel(SyncModel.PER_GEODATABASE);
-                                    generateGeodatabaseParameters.getLayerOptions().add(new GenerateLayerOption(0));
-
-                                    String geodatabaseFile = Environment.getExternalStorageDirectory().getPath() + "/test.geodatabase";
-                                    final File file = new File(geodatabaseFile);
-                                    if (file.exists()) {
-                                        file.delete();
-                                        showMessage("File deleted from " + file.getAbsolutePath());
-                                    }
-                                    final GenerateGeodatabaseJob generateGeodatabaseJob =
-                                            geodatabaseSyncTask.generateGeodatabaseAsync(generateGeodatabaseParameters, geodatabaseFile);
-                                    boolean status = generateGeodatabaseJob.start();
-//                                   final List<Job.Message> messages = generateGeodatabaseJob.getMessages();
-
-                                    if (generateGeodatabaseJob.getStatus() == Job.Status.STARTED) {
-                                        progressD.setTitle("Generating geodatabase...");
-                                        progressD.show();
-
-                                        final List<Job.Message> messages = generateGeodatabaseJob.getMessages();
-                                        generateGeodatabaseJob.addJobChangedListener(new Runnable() {
-                                            @Override
-                                            public void run() {
-
-                                                for (Job.Message message : messages) {
-                                                    progressD.setMessage(message.getMessage());
-                                                }
-                                            }
-                                        });
-
-                                        generateGeodatabaseJob.addJobDoneListener(new Runnable() {
-                                            @Override
-                                            public void run() {
-
-                                                if (generateGeodatabaseJob.getStatus() == Job.Status.SUCCEEDED) {
-                                                    progressD.dismiss();
-                                                    geodatabase = generateGeodatabaseJob.getResult();
-                                                    showMessage("Offline geodatabase successfully downloaded.");
-                                                    controlsView.findViewById(R.id.edit_data).setVisibility(View.VISIBLE);
-                                                } else if (generateGeodatabaseJob.getStatus() == Job.Status.FAILED) {
-                                                    progressD.setMessage("Offline geodatabase generation failed with error: \n" +
-                                                            generateGeodatabaseJob.getError().getAdditionalMessage());
-                                                    try {
-                                                        Thread.sleep(5000);
-                                                        progressD.dismiss();
-
-                                                    } catch (InterruptedException in) {
-
-                                                    }
-                                                }
-                                            }
-                                        });
-                                    }
+                                    controlsView.findViewById(R.id.sync_data).setVisibility(View.VISIBLE);
                                 }
                             }
                         });
-
-
                     }
-
                 });
 
             }
@@ -333,25 +262,30 @@ public class ControlsFragment extends Fragment {
                 syncGdbJob = geodatabaseSyncTask.syncGeodatabaseAsync(syncGeodatabaseParameters, geodatabase);
                 syncGdbJob.start();
                 final List<Job.Message> messages = syncGdbJob.getMessages();
-                progressD.setTitle("Synchronizing geodatabase...");
-                progressD.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                progressD.show();
-                syncGdbJob.addJobChangedListener(new Runnable() {
-                    @Override
-                    public void run() {
-                        for(Job.Message message : messages){
-                            progressD.setMessage(message.getMessage());
-                        }
-                    }
-                });
-
-               syncGdbJob.addJobDoneListener(new Runnable() {
+               getActivity().runOnUiThread(new Runnable() {
                    @Override
                    public void run() {
-                       if(syncGdbJob.getStatus() == Job.Status.SUCCEEDED){
-                           showMessage("Offline edits synchronized successfully");
-                           progressD.dismiss();
-                       }
+                       progressD.setTitle("Synchronizing geodatabase...");
+                       progressD.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                       progressD.show();
+                       syncGdbJob.addJobChangedListener(new Runnable() {
+                           @Override
+                           public void run() {
+                               for(Job.Message message : messages){
+                                   progressD.setMessage(message.getMessage());
+                               }
+                           }
+                       });
+
+                       syncGdbJob.addJobDoneListener(new Runnable() {
+                           @Override
+                           public void run() {
+                               if(syncGdbJob.getStatus() == Job.Status.SUCCEEDED){
+                                   showMessage("Offline edits synchronized successfully");
+                                   progressD.dismiss();
+                               }
+                           }
+                       });
                    }
                });
             return  null;
@@ -361,11 +295,65 @@ public class ControlsFragment extends Fragment {
 
 
     private void performEdits(){
+        geodatabaseSyncTask = new GeodatabaseSyncTask(getContext(), "http://sampleserver5.arcgisonline.com/arcgis/rest/services/Sync/WildfireSync/FeatureServer");
+        GenerateGeodatabaseParameters generateGeodatabaseParameters = new GenerateGeodatabaseParameters();
+        generateGeodatabaseParameters.setExtent(extent);
+        generateGeodatabaseParameters.setOutSpatialReference(featureLayer.getSpatialReference());
+        generateGeodatabaseParameters.setSyncModel(SyncModel.PER_LAYER);
+        generateGeodatabaseParameters.getLayerOptions().add(new GenerateLayerOption(0));
+
+        String geodatabaseFile = Environment.getExternalStorageDirectory().getPath() + "/test.geodatabase";
+        final File file = new File(geodatabaseFile);
+        if (file.exists()) {
+            file.delete();
+            showMessage("Geodatabase file deleted from " + file.getAbsolutePath());
+        }
+        final GenerateGeodatabaseJob generateGeodatabaseJob =
+                geodatabaseSyncTask.generateGeodatabaseAsync(generateGeodatabaseParameters, geodatabaseFile);
+        boolean status = generateGeodatabaseJob.start();
+//                                   final List<Job.Message> messages = generateGeodatabaseJob.getMessages();
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (generateGeodatabaseJob.getStatus() == Job.Status.STARTED) {
+                    progressD.setTitle("Generating geodatabase...");
+                    progressD.show();
+                    final List<Job.Message> messages = generateGeodatabaseJob.getMessages();
+                    generateGeodatabaseJob.addJobChangedListener(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (Job.Message message : messages) {
+                                progressD.setMessage(message.getMessage());
+                            }
+                        }
+                    });
+
+                    generateGeodatabaseJob.addJobDoneListener(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (generateGeodatabaseJob.getStatus() == Job.Status.SUCCEEDED) {
+                                progressD.dismiss();
+                                geodatabase = generateGeodatabaseJob.getResult();
+                                showMessage("Offline geodatabase successfully downloaded.");
+                                controlsView.findViewById(R.id.edit_data).setVisibility(View.VISIBLE);
+                            } else if (generateGeodatabaseJob.getStatus() == Job.Status.FAILED) {
+                                progressD.setMessage("Offline geodatabase generation failed with error: \n" +
+                                        generateGeodatabaseJob.getError().getAdditionalMessage());
+                                progressD.dismiss();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+
         if(geodatabase != null){
             geodatabase.loadAsync();
            geodatabaseFeatureTable = geodatabase.getGeodatabaseFeatureTableByServiceLayerId(0);
-            geodatabaseFeatureTable.loadAsync();
-
+           if(geodatabaseFeatureTable != null)
+               geodatabaseFeatureTable.loadAsync();
             if(geodatabaseFeatureTable == null){
                 showMessage("Could not detect the table with the specified id. \n Please try again.");
                 return;
@@ -375,11 +363,10 @@ public class ControlsFragment extends Fragment {
                 public void run() {
                    LoadStatus status = geodatabaseFeatureTable.getLoadStatus();
                     if(status == LoadStatus.LOADED){
-                        showMessage("offline gdb successfully loaded!");
+                        showMessage("offline gdb successfully loaded for editing!\n Click anywhere in current map view to begin editing.");
                     }
                 }
             });
-            controlsView.findViewById(R.id.sync_data).setVisibility(View.VISIBLE);
         }
     }
 
@@ -408,7 +395,7 @@ public class ControlsFragment extends Fragment {
 
     }
     private void createWebMap(PortalItemType portalItemType) {
-        new ControlsFragAsync().execute();
+        new ControlsAddDataAsync().execute();
     }
 
 

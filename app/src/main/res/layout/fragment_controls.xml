@@ -33,7 +33,7 @@
         app:backgroundTint="@android:color/transparent" />
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/add_data"
-        android:src="@drawable/gdb_download"
+        android:src="@drawable/add_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:useCompatPadding="true"
@@ -44,10 +44,10 @@
         android:layout_toStartOf="@+id/show_layers" />
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/edit_data"
-        android:src="@drawable/edit"
+        android:src="@drawable/gdb_download"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="visible"
+        android:visibility="gone"
         app:useCompatPadding="true"
         app:fabSize="mini"
         app:backgroundTintMode="src_atop"
@@ -60,7 +60,7 @@
         android:src="@drawable/gdb_synchronize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="visible"
+        android:visibility="gone"
         app:useCompatPadding="true"
         app:fabSize="mini"
         app:backgroundTintMode="src_atop"

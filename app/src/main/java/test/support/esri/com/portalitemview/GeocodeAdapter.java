@@ -27,21 +27,18 @@ public class GeocodeAdapter extends RecyclerView.Adapter<GeocodeAdapter.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         TextView geocodeText = holder.innnerText;
         geocodeText.setText(dataGeocoded.getLabelName().get(position));
         geocodeText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Point point = dataGeocoded.getLocationPoint().get(position);
-                Intent intent = new Intent(v.getContext(), PortalViewMain.class);
+                Intent intent = new Intent(v.getContext(), GeocodeActivity.class);
                 double[] coordinates = {point.getX(), point.getY(),
                         new Integer(point.getSpatialReference().getWkid()).doubleValue()};
                 intent.putExtra("point", coordinates);
-                    v.getContext().startActivity(intent);
-                /*mapView.setMap(new Map(Basemap.createLightGrayCanvas()));
-                mapView.setViewpointCenterAsync(point);
-                Toast.makeText(v.getContext(), "Map point is: "+point.getX(), Toast.LENGTH_LONG).show();*/
+                v.getContext().startActivity(intent);
             }
         });
     }

@@ -12,19 +12,23 @@
         <item
             android:id="@+id/nav_login"
             android:icon="@drawable/ic_cloud_done_black_24dp"
-            android:title="Log in to Portal" />
+            android:title="Log in to Portal"
+            android:enabled="true"/>
         <item
             android:id="@+id/nav_routing"
             android:icon="@drawable/ic_near_me_black_24dp"
-            android:title="Navigation mode" />
+            android:title="Navigation mode"
+            android:enabled="false"/>
         <item
             android:id="@+id/nav_3d"
             android:icon="@drawable/ic_3d_rotation_black_24dp"
-            android:title="3D Maps" />
+            android:title="3D Maps"
+            android:enabled="true"/>
         <item
             android:id="@+id/nav_address"
             android:icon="@drawable/ic_place_black_24dp"
-            android:title="Locate an address" />
+            android:title="Locate an address"
+            android:enabled="false"/>
     </group>
 
     <item android:title="ArcGIS Community">
