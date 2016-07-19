@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1070538708941",
+    "firebase_url": "https://esriportalitemview.firebaseio.com",
+    "project_id": "esriportalitemview",
+    "storage_bucket": "esriportalitemview.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1070538708941:android:de92736ac8f2ca89",
+        "android_client_info": {
+          "package_name": "test.support.esri.com.portalitemview"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1070538708941-d4d49ck5o6guqm90si7tn31sgc95f5j8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_HMvnpYvCpiDJr5W-VhCjaqajY7RWHlU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
