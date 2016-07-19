@@ -48,6 +48,7 @@ import com.esri.arcgisruntime.tasks.route.Stop;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -74,14 +75,16 @@ public class RoutingFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private View routeFragmentView;
     private FloatingActionButton floatingRouteButton;
-    private final String AGO_ROUTING_SERVICE= "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
-//    private final String AGO_ROUTING_SERVICE= "http://192.168.1.6:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
+//    private final String AGO_ROUTING_SERVICE = "http://sampleserver3.arcgisonline.com/ArcGIS/rest/services/Network/USA/NAServer/Route";
+//    private final String AGO_ROUTING_SERVICE= "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
+    private final String AGO_ROUTING_SERVICE= "http://192.168.1.6:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
     private ProgressDialog progressDialog;
     private  Route route;
     private DrawerLayout route_drawer_layout;
     private FloatingActionButton directionsFloatingButton;
     private TextToSpeech textToSpeech;
     private Switch switcher;
+    private GraphicsOverlay graphicsOverlay;
     //private final String AGO_ROUTING_SERVICE= "http://sampleserver3.arcgisonline.com/ArcGIS/rest/services/Network/USA/NAServer/Route";
 
 
@@ -133,7 +136,7 @@ public class RoutingFragment extends Fragment {
 
         route_drawer_layout = (DrawerLayout)routeFragmentView.findViewById(R.id.route_drawer_layout);
         directionsFloatingButton = (FloatingActionButton)routeFragmentView.findViewById(R.id.directions);
-/*ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(getActivity(), route_drawer_layout,
+        /*ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(getActivity(), route_drawer_layout,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         route_drawer_layout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();*/
@@ -242,15 +245,11 @@ public class RoutingFragment extends Fragment {
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                   /* routingProgressBar.setVisibility(View.VISIBLE);
-                                    routingProgressBar.setIndeterminate(true);*/
                                     progressDialog = ProgressDialog.show(getContext(),
                                             "Calculating Route...", "Please waiting... calculating route",
                                             true);
-                                    progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                                 }
                             });
-                            Log.d("KwasiLocatorLoaded: ", locatorTask.getLoadStatus().toString());
                             SuggestParameters suggestParams = new SuggestParameters();
                             suggestParams.setCountryCode("USA");
                             //perform for from location
@@ -268,127 +267,114 @@ public class RoutingFragment extends Fragment {
                                     SpatialReference.create(4326)));
 
                             //start the routing proper
-                            final GraphicsOverlay graphicsOverlay = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
-                            final RouteTask routeTask = new RouteTask(AGO_ROUTING_SERVICE);
-
-                            routeTask.loadAsync();
-
-                            routeTask.addDoneLoadingListener(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        if(routeTask.getLoadStatus() == LoadStatus.LOADED){
-                                            final RouteParameters routeParams = routeTask.generateDefaultParametersAsync().get();
-                                            routeParams.setReturnDirections(true);
-                                            List<Stop> routeStops = routeParams.getStops();
-                                            if(geocodedPoints.size() != 0){
-                                                routeStops.add(new Stop(geocodedPoints.get(0)));
-                                                routeStops.add(new Stop(geocodedPoints.get(1)));
-                                            }
-
-                                            RouteResult routeResult = routeTask.solveAsync(routeParams).get();
-                                            route = routeResult.getRoutes().get(0);
-                                            final Polyline routeLines = route.getRouteGeometry();
-
-                                            //construct route lines and add to graphicsoverlay
-                                            final Graphic routeGraphic = new Graphic(routeLines);
-                                            Symbol routeSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.BLUE, 4);
-                                            routeGraphic.setSymbol(routeSymbol);
-                                            graphicsOverlay.getGraphics().add(routeGraphic);
-
-
-                                            //construct origin and destination and add to layer
-                                            Uri uri =Uri.parse("android.resource://test.support.esri.com/"+R.drawable.geolocation);
-                                            PictureMarkerSymbol originMarkerSymbol = new PictureMarkerSymbol(
-                                                 new BitmapDrawable(getResources(), BitmapFactory.decodeFile(uri.getPath())));
-                                            originMarkerSymbol.loadAsync();
-                                            SimpleMarkerSymbol originMarkerSym = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.DIAMOND,
-                                                    Color.GREEN, 15);
-                                            Graphic originGraphic = new Graphic(geocodedPoints.get(0), originMarkerSym);
-                                            graphicsOverlay.getGraphics().add(originGraphic);
-                                            /*Point originPoint = new Point(geocodedPoints.get(0).getX(),geocodedPoints.get(0).getY(),
-                                                    SpatialReference.create(4326));
-                                            Graphic originGraphic = new Graphic(geocodedPoints.get(0), originMarkerSymbol);
-                                            graphicsOverlay.getGraphics().add(originGraphic);
-
-                                            Point destinationPoint = new Point(geocodedPoints.get(1).getX(),geocodedPoints.get(1).getY(),
-                                                    SpatialReference.create(4326));
-                                            PictureMarkerSymbol destinationMarkerSymbol = new PictureMarkerSymbol(new BitmapDrawable(getResources(), BitmapFactory.decodeFile("/res/drawable/geolocation.xml")));
-                                            destinationMarkerSymbol.loadAsync();*/
-
-                                            SimpleMarkerSymbol destinationMarkerSym = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.TRIANGLE,
-                                                    Color.RED, 20);
-                                            Graphic destinationGraphic = new Graphic(geocodedPoints.get(1), destinationMarkerSym);
-                                            graphicsOverlay.getGraphics().add(destinationGraphic);
-                                            getActivity().runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    MapView routeMapView = (MapView)getActivity().findViewById(R.id.nav_map_view);
-                                                    routeMapView.getGraphicsOverlays().add(graphicsOverlay);
-                                                   /* getActivity().getSupportFragmentManager().beginTransaction().hide(
-                                                            getActivity().getSupportFragmentManager().findFragmentByTag("RoutingFrag")
-                                                    ).commit()*/;
-                                                    /*getActivity().getSupportFragmentManager().findFragmentByTag("RoutingFrag")
-                                                            .getView().findViewById(R.id.from_to_layout).setVisibility(View.GONE);*/
-                                                    routeFragmentView.findViewById(R.id.from_to_layout).setVisibility(View.GONE);
-
-                                                    routeMapView.setViewpointGeometryWithPaddingAsync(routeLines, 250);
-                                                    /*routingProgressBar.setIndeterminate(false);
-                                                    routingProgressBar.setVisibility(View.INVISIBLE);*/
-                                                    progressDialog.dismiss();
-                                                    RecyclerView routeRecycler = (RecyclerView) routeFragmentView.findViewById(R.id.route_recycler_view);
-                                                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-                                                    routeRecycler.setLayoutManager(linearLayoutManager);
-                                                    final ArrayList<DirectionManeuver> directionManeuvers = new ArrayList<>(route.getDirectionManeuvers());
-
-                                                    RoutingManouversData routingManouversData = new RoutingManouversData(directionManeuvers, route);
-                                                    RoutingManouvAdapter routeInfoAdapter = new RoutingManouvAdapter(routingManouversData);
-                                                    routeRecycler.setAdapter(routeInfoAdapter);
-                                                    routeFragmentView.findViewById(R.id.route_information).setVisibility(View.VISIBLE);
-                                                    routeFragmentView.findViewById(R.id.route_results_layout).setVisibility(View.VISIBLE);
-                                                    TextView arrivalTime = (TextView) routeFragmentView.findViewById(R.id.arrival_time);
-
-                                                    arrivalTime.setText("Arrive: "+route.getLocalEndTime().HOUR +":"+
-                                                    route.getLocalEndTime().MINUTE + "\n "
-                                                    +"Duration: "+convertMinutesToHoursMins(route.getTotalTime()));
-                                                    TextView totalDistance = (TextView)routeFragmentView.findViewById(R.id.time_of_travel);
-
-                                                    totalDistance.setText("Distance: "+convertMetersToMiles(route.getTotalLength())+ " mi");
-
-                                                    route_drawer_layout.openDrawer(GravityCompat.END);
-                                                    directionsFloatingButton.setOnClickListener(new View.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(View v) {
-/*
-                                                            getActivity().getSupportFragmentManager().beginTransaction().hide(
-                                                                   getActivity().getSupportFragmentManager().findFragmentByTag("RoutingFrag")
-                                                            ).commit();*/
-                                                            route_drawer_layout.closeDrawer(GravityCompat.END);
-                                                            routeFragmentView.findViewById(R.id.route_results_layout).setVisibility(View.VISIBLE);
-                                                            if(textToSpeech != null) {
-                                                                for (int i = 0; i < directionManeuvers.size(); i++) {
-
-                                                                    textToSpeech.speak(directionManeuvers.get(i).getDirectionText(), TextToSpeech.QUEUE_ADD,
-                                                                            null, "stringUtterID");
-                                                                }
-                                                            }
-                                                        }
-                                                    });
-
-                                                }
-                                            });
-                                        }
-                                    }catch(ExecutionException|InterruptedException inex){
-                                        Log.d("KwasiRouteException ", inex.getMessage());
-                                    }
-                                }
-                            });
-
+                            graphicsOverlay = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
                         }catch(ExecutionException|InterruptedException exIn){
 
                         }
                     }
                 }
+            });
+
+            final RouteTask routeTask = new RouteTask(AGO_ROUTING_SERVICE);
+//            routeTask.setCredential(new UserCredential("mrasante1", "apple@4GONES"));
+            routeTask.loadAsync();
+
+            routeTask.addDoneLoadingListener(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if(routeTask.getLoadStatus() == LoadStatus.LOADED){
+                            final RouteParameters routeParams = routeTask.generateDefaultParametersAsync().get();
+                            routeParams.setReturnDirections(true);
+                            List<Stop> routeStops = routeParams.getStops();
+                            if(geocodedPoints.size() != 0){
+                                routeStops.add(new Stop(geocodedPoints.get(0)));
+                                routeStops.add(new Stop(geocodedPoints.get(1)));
+                            }
+
+                            RouteResult routeResult = routeTask.solveAsync(routeParams).get();
+                            route = routeResult.getRoutes().get(0);
+                            final Polyline routeLines = route.getRouteGeometry();
+
+                            //construct route lines and add to graphicsoverlay
+                            final Graphic routeGraphic = new Graphic(routeLines);
+                            Symbol routeSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.BLUE, 4);
+                            routeGraphic.setSymbol(routeSymbol);
+                            graphicsOverlay.getGraphics().add(routeGraphic);
+
+
+                            //construct origin and destination and add to layer
+                            Uri uri =Uri.parse("android.resource://test.support.esri.com/"+R.drawable.geolocation);
+                            PictureMarkerSymbol originMarkerSymbol = new PictureMarkerSymbol(
+                                    new BitmapDrawable(getResources(), BitmapFactory.decodeFile(uri.getPath())));
+                            originMarkerSymbol.loadAsync();
+                            SimpleMarkerSymbol originMarkerSym = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.DIAMOND,
+                                    Color.GREEN, 15);
+                            Graphic originGraphic = new Graphic(geocodedPoints.get(0), originMarkerSym);
+                            graphicsOverlay.getGraphics().add(originGraphic);
+
+                            SimpleMarkerSymbol destinationMarkerSym = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.TRIANGLE,
+                                    Color.RED, 20);
+                            Graphic destinationGraphic = new Graphic(geocodedPoints.get(1), destinationMarkerSym);
+                            graphicsOverlay.getGraphics().add(destinationGraphic);
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    MapView routeMapView = (MapView)getActivity().findViewById(R.id.nav_map_view);
+                                    routeMapView.getGraphicsOverlays().add(graphicsOverlay);
+                                                   /* getActivity().getSupportFragmentManager().beginTransaction().hide(
+                                                            getActivity().getSupportFragmentManager().findFragmentByTag("RoutingFrag")
+                                                    ).commit()*/;
+                                                    /*getActivity().getSupportFragmentManager().findFragmentByTag("RoutingFrag")
+                                                            .getView().findViewById(R.id.from_to_layout).setVisibility(View.GONE);*/
+                                    routeFragmentView.findViewById(R.id.from_to_layout).setVisibility(View.GONE);
+
+                                    routeMapView.setViewpointGeometryWithPaddingAsync(routeLines, 250);
+                                                    /*routingProgressBar.setIndeterminate(false);
+                                                    routingProgressBar.setVisibility(View.INVISIBLE);*/
+                                    progressDialog.dismiss();
+                                    RecyclerView routeRecycler = (RecyclerView) routeFragmentView.findViewById(R.id.route_recycler_view);
+                                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+                                    routeRecycler.setLayoutManager(linearLayoutManager);
+                                    final ArrayList<DirectionManeuver> directionManeuvers = new ArrayList<>(route.getDirectionManeuvers());
+
+                                    RoutingManouversData routingManouversData = new RoutingManouversData(directionManeuvers, route);
+                                    RoutingManouvAdapter routeInfoAdapter = new RoutingManouvAdapter(routingManouversData);
+                                    routeRecycler.setAdapter(routeInfoAdapter);
+                                    routeFragmentView.findViewById(R.id.route_information).setVisibility(View.VISIBLE);
+                                    routeFragmentView.findViewById(R.id.route_results_layout).setVisibility(View.VISIBLE);
+                                    TextView arrivalTime = (TextView) routeFragmentView.findViewById(R.id.arrival_time);
+
+                                    arrivalTime.setText("Arrive: "+route.getLocalEndTime().get(Calendar.HOUR)+":"+
+                                            route.getLocalEndTime().get(Calendar.MINUTE) + "\n "
+                                            +"Duration: "+convertMinutesToHoursMins(route.getTotalTime()));
+                                    TextView totalDistance = (TextView)routeFragmentView.findViewById(R.id.time_of_travel);
+
+                                    totalDistance.setText("Distance: "+convertMetersToMiles(route.getTotalLength())+ " mi");
+
+                                    route_drawer_layout.openDrawer(GravityCompat.END);
+                                    directionsFloatingButton.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            route_drawer_layout.closeDrawer(GravityCompat.END);
+                                            routeFragmentView.findViewById(R.id.route_results_layout).setVisibility(View.VISIBLE);
+                                            if(textToSpeech != null) {
+                                                for (int i = 0; i < directionManeuvers.size(); i++) {
+                                                    textToSpeech.speak(directionManeuvers.get(i).getDirectionText(), TextToSpeech.QUEUE_ADD,
+                                                            null, "stringUtterID");
+                                                }
+                                            }
+                                        }
+                                    });
+
+                                }
+                            });
+                        }
+                    }catch(ExecutionException|InterruptedException inex){
+                        Log.d("KwasiRouteException ", inex.getMessage());
+                    }
+                }
+
             });
 
             Log.d("KwasiRouteTest", locatorTask.getLoadStatus().toString());

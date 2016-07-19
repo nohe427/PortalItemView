@@ -237,6 +237,7 @@ public class ControlsFragment extends Fragment {
                                     Viewpoint viewPoint = new Viewpoint(extent);
                                     mapView.setViewpointAsync(viewPoint);
                                     showMessage("Feature layer " + featureLayer.getName() + " successfully loaded and added to the map.");
+                                    controlsView.findViewById(R.id.edit_data).setVisibility(View.VISIBLE);
                                     controlsView.findViewById(R.id.sync_data).setVisibility(View.VISIBLE);
                                 }
                             }
@@ -255,9 +256,9 @@ public class ControlsFragment extends Fragment {
         protected Void doInBackground(Void... params) {
                 SyncGeodatabaseParameters syncGeodatabaseParameters = new SyncGeodatabaseParameters();
                 syncGeodatabaseParameters.setRollbackOnFailure(true);
-                syncGeodatabaseParameters.setSyncDirection(SyncGeodatabaseParameters.SyncDirection.BIDIRECTIONAL);
+                syncGeodatabaseParameters.setSyncDirection(SyncGeodatabaseParameters.SyncDirection.UPLOAD);
                 SyncLayerOption syncLayerOption = new SyncLayerOption(0);
-                syncLayerOption.setSyncDirection(SyncGeodatabaseParameters.SyncDirection.BIDIRECTIONAL);
+                syncLayerOption.setSyncDirection(SyncGeodatabaseParameters.SyncDirection.UPLOAD);
                 syncGeodatabaseParameters.getLayerOptions().add(syncLayerOption);
                 syncGdbJob = geodatabaseSyncTask.syncGeodatabaseAsync(syncGeodatabaseParameters, geodatabase);
                 syncGdbJob.start();
@@ -266,7 +267,6 @@ public class ControlsFragment extends Fragment {
                    @Override
                    public void run() {
                        progressD.setTitle("Synchronizing geodatabase...");
-                       progressD.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                        progressD.show();
                        syncGdbJob.addJobChangedListener(new Runnable() {
                            @Override
@@ -284,10 +284,16 @@ public class ControlsFragment extends Fragment {
                                    showMessage("Offline edits synchronized successfully");
                                    progressD.dismiss();
                                }
+                               if(syncGdbJob.getStatus() == Job.Status.FAILED){
+                                   showMessage("Sync failure message: "+ syncGdbJob.getError().getAdditionalMessage());
+                                   progressD.dismiss();
+                               }
                            }
                        });
                    }
                });
+
+
             return  null;
 
         }
@@ -297,7 +303,7 @@ public class ControlsFragment extends Fragment {
     private void performEdits(){
         geodatabaseSyncTask = new GeodatabaseSyncTask(getContext(), "http://sampleserver5.arcgisonline.com/arcgis/rest/services/Sync/WildfireSync/FeatureServer");
         GenerateGeodatabaseParameters generateGeodatabaseParameters = new GenerateGeodatabaseParameters();
-        generateGeodatabaseParameters.setExtent(extent);
+        generateGeodatabaseParameters.setExtent(mapView.getVisibleArea());
         generateGeodatabaseParameters.setOutSpatialReference(featureLayer.getSpatialReference());
         generateGeodatabaseParameters.setSyncModel(SyncModel.PER_LAYER);
         generateGeodatabaseParameters.getLayerOptions().add(new GenerateLayerOption(0));
