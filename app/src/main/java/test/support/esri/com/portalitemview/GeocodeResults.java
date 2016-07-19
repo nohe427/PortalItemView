@@ -30,6 +30,7 @@ public class GeocodeResults extends Activity {
     private GeocodeData geocodeAdapterData;
     private FirebaseAnalytics mFirebaseAnalytics;
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
