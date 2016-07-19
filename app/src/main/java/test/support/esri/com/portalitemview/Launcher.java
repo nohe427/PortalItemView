@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import com.google.android.gms.vision.barcode.Barcode;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -17,11 +19,15 @@ public class Launcher extends AppCompatActivity implements LogInFragment.OnFragm
 PortalViewFragment.OnFragmentInteractionListener, AnonymousPortalFragment.OnFragmentInteractionListener{
 
     private Button signInButton;
-
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //init firebase analytics
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        mFirebaseAnalytics.logEvent("appopened", null);
 
         setContentView(R.layout.activity_app_launcher);
 
@@ -43,6 +49,8 @@ PortalViewFragment.OnFragmentInteractionListener, AnonymousPortalFragment.OnFrag
             public void onClick(View v) {
                 Intent annonIntent = new Intent(getApplicationContext(), PortalViewMain.class);
                 annonIntent.putExtra("AnonymousAccess", "AnonAccess");
+                Bundle bundle = new Bundle();
+                mFirebaseAnalytics.logEvent("AnonymousSignOn", bundle);
                 startActivity(annonIntent);
             }
         });

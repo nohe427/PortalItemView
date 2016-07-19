@@ -30,6 +30,7 @@ import com.esri.arcgisruntime.portal.PortalQueryParams;
 import com.esri.arcgisruntime.portal.PortalQueryResultSet;
 import com.esri.arcgisruntime.security.UserCredential;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -48,6 +49,7 @@ public class PortalViewFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -81,6 +83,7 @@ public class PortalViewFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity());
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -178,6 +181,7 @@ public class PortalViewFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     try {
+                                        mFirebaseAnalytics.logEvent("successfullyloadedportal", null);
                                         progressDialog = ProgressDialog.show(getContext(), "Loading... ",
                                                 "Loading content from " + portal.getUri().toString(), true);
                                         Snackbar.make(getActivity().findViewById(R.id.nav_map_view), "Portal loaded for " +
@@ -242,6 +246,7 @@ public class PortalViewFragment extends Fragment {
 
                         } else {
                             if (portal.getLoadStatus() == LoadStatus.FAILED_TO_LOAD) {
+                                mFirebaseAnalytics.logEvent("failedtoloadedportal", null);
                                 Snackbar.make(getActivity().findViewById(R.id.nav_view), "The provided credentials not valid for " +
                                         portal.getUri(), Snackbar.LENGTH_LONG).show();
                             }

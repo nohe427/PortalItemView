@@ -46,6 +46,7 @@ import com.esri.arcgisruntime.tasks.route.RouteResult;
 import com.esri.arcgisruntime.tasks.route.RouteTask;
 import com.esri.arcgisruntime.tasks.route.Stop;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +67,7 @@ public class RoutingFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private final String AGO_GEOCODE_URL = "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer";
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -110,6 +112,8 @@ public class RoutingFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity());
+        mFirebaseAnalytics.logEvent("routingfragmentopened", null);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -186,6 +190,7 @@ public class RoutingFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... params) {
+            mFirebaseAnalytics.logEvent("routingstarted", null);
             performRouting();
             return null;
         }
@@ -230,6 +235,10 @@ public class RoutingFragment extends Fragment {
             EditText toRouteLocation = (EditText) routeFragmentView.findViewById(R.id.to_route_location);
             final String fromPoint = fromRouteLocation.getText().toString().trim();
             final String toPoint = toRouteLocation.getText().toString().trim();
+            Bundle bundle = new Bundle();
+            bundle.putString("toaddress", toPoint);
+            bundle.putString("fromaddress", fromPoint);
+            mFirebaseAnalytics.logEvent("addressestoroute", bundle);
             final LocatorTask locatorTask = new LocatorTask(AGO_GEOCODE_URL);
             locatorTask.loadAsync();
             locatorTask.addDoneLoadingListener(new Runnable() {

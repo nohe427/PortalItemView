@@ -16,6 +16,7 @@ import com.esri.arcgisruntime.tasks.geocode.GeocodeParameters;
 import com.esri.arcgisruntime.tasks.geocode.GeocodeResult;
 import com.esri.arcgisruntime.tasks.geocode.LocatorTask;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -27,10 +28,11 @@ public class GeocodeResults extends Activity {
     private RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
     private GeocodeData geocodeAdapterData;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         setContentView(R.layout.activity_geocode_results);
        new GeocodePlaceAsyncTask().execute();
     }
@@ -54,6 +56,9 @@ public class GeocodeResults extends Activity {
         private void handleIntent(Intent intent) {
             if(Intent.ACTION_SEARCH.equals(intent.getAction())){
                 final String query = intent.getStringExtra(SearchManager.QUERY);
+                Bundle params = new Bundle();
+                params.putString(FirebaseAnalytics.Param.SEARCH_TERM, query);
+                mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, params);
                 final LocatorTask locatorTask = new LocatorTask("http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer");
                 locatorTask.loadAsync();
                 final GeocodeParameters geocodeParameters = new GeocodeParameters();
