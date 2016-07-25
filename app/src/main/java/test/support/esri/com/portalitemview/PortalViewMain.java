@@ -240,7 +240,6 @@ public class PortalViewMain extends AppCompatActivity
 
 
     public void performArcGISOnlineQuery() {
-
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         PortalViewFragment portalViewFragment = new PortalViewFragment();
         Bundle argBundle = new Bundle();
@@ -250,8 +249,6 @@ public class PortalViewMain extends AppCompatActivity
         fragmentTransaction.add(R.id.nav_map_view, portalViewFragment, "recycler_view_fragment")
                 .addToBackStack("recycler_transaction")
                 .commit();
-
-
     }
 
     @Override

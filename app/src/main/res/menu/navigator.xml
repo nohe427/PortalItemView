@@ -26,4 +26,11 @@
         app:showAsAction="never"
         android:icon="@drawable/ic_layers_black_24dp"
         />
+
+    <item
+        android:id="@+id/navigation_results_drawer"
+        android:title="@string/nav_results"
+        app:showAsAction="never"
+        android:icon="@drawable/ic_layers_black_24dp"
+        />
 </menu>
