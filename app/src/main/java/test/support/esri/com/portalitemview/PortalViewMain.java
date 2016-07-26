@@ -344,6 +344,10 @@ public class PortalViewMain extends AppCompatActivity
             showLayersFragment.setArguments(showFragBundle);
             getSupportFragmentManager().beginTransaction().add(R.id.nav_map_view, showLayersFragment, "Show_Layers_Frag")
                     .commit();
+        }else if(id==R.id.navigation_results_drawer){
+            Fragment routingFragment = getSupportFragmentManager().findFragmentByTag("RoutingFrag");
+            DrawerLayout drawerLayout = (DrawerLayout)routingFragment.getView().findViewById(R.id.route_drawer_layout);
+            drawerLayout.openDrawer(GravityCompat.END);
         }
 
         return super.onOptionsItemSelected(item);
@@ -363,8 +367,7 @@ public class PortalViewMain extends AppCompatActivity
                     getSupportFragmentManager().beginTransaction().remove(fragments.get(i)).commit();
                 }
                 finish();
-               startActivity(new Intent(getApplicationContext(), Launcher.class));
-
+                startActivity(new Intent(getApplicationContext(), Launcher.class));
             }
 
             //implement logic to log out of portal
@@ -420,8 +423,16 @@ public class PortalViewMain extends AppCompatActivity
         locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.NAVIGATION);
         locationDisplay.startAsync();
 
-        getSupportFragmentManager().beginTransaction().add(R.id.nav_map_view, new RoutingFragment(), "RoutingFrag").commit();
-    }
+        //check to see if the fragment is already initialized before doing anything else
+        //this ensures we work with the same objects and not reinitialize them
+        Fragment routingFragment = getSupportFragmentManager().findFragmentByTag("RoutingFrag");
+        if(routingFragment !=null){
+            routingFragment.getView().setVisibility(View.VISIBLE);
+            routingFragment.getView().findViewById(R.id.from_to_layout).setVisibility(View.VISIBLE);
+        }else{
+            getSupportFragmentManager().beginTransaction().add(R.id.nav_map_view, new RoutingFragment(), "RoutingFrag").commit();
+        }
+                }
 
     @Override
     public void onFragmentInteraction(Uri uri) {

@@ -75,8 +75,8 @@ public class RoutingFragment extends Fragment {
     private DrawerLayout routeFragmentView;
     private FloatingActionButton floatingRouteButton;
 //    private final String AGO_ROUTING_SERVICE = "http://sampleserver3.arcgisonline.com/ArcGIS/rest/services/Network/USA/NAServer/Route";
-//    private final String AGO_ROUTING_SERVICE= "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
-    private final String AGO_ROUTING_SERVICE= "http://192.168.1.6:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
+    private final String AGO_ROUTING_SERVICE= "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
+//    private final String AGO_ROUTING_SERVICE= "http://192.168.1.6:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
 //    private final String AGO_ROUTING_SERVICE = "http://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
     private ProgressDialog progressDialog;
     private  Route route;
@@ -84,7 +84,7 @@ public class RoutingFragment extends Fragment {
     private FloatingActionButton directionsFloatingButton;
     private TextToSpeech textToSpeech;
     private Switch switcher;
-    private GraphicsOverlay graphicsOverlay;
+    private GraphicsOverlay graphicsOverlay = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
 
     //private final String AGO_ROUTING_SERVICE= "http://sampleserver3.arcgisonline.com/ArcGIS/rest/services/Network/USA/NAServer/Route";
 
@@ -187,7 +187,9 @@ public class RoutingFragment extends Fragment {
 
 
     public class RoutingFragAsyncTask extends AsyncTask<Void, Void, Void>{
-        ArrayList<Point> geocodedPoints;
+        ArrayList<Point> fromGeocodedPoints;
+        ArrayList<Point> toGeocodedPoints;
+
         @Override
         protected Void doInBackground(Void... params) {
             performNavigation();
@@ -227,12 +229,13 @@ public class RoutingFragment extends Fragment {
 
 
         /**
-         * Perform routing which includes first geocoding the entered origin/destination and the
+         * Perform geocoding of the entered origin/destination and the
          * use the stops for routing
-         * @return geocodedPoints
+         * @return fromGeocodedPoints
          */
-        private synchronized ArrayList<Point> performGeocoding() {
-            geocodedPoints = new ArrayList<>();
+        private ArrayList<Point> performGeocoding() {
+            fromGeocodedPoints = new ArrayList<>();
+            toGeocodedPoints = new ArrayList<>();
             EditText fromRouteLocation = (EditText) routeFragmentView.findViewById(R.id.from_route_location);
             EditText toRouteLocation = (EditText) routeFragmentView.findViewById(R.id.to_route_location);
             final String fromPoint = fromRouteLocation.getText().toString().trim();
@@ -248,7 +251,7 @@ public class RoutingFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     progressDialog = ProgressDialog.show(getContext(),
-                                            "Geocoding origin and destination", "Please wait...",
+                                            "Performing geocoding", "Geocoding origin and destination points. \nPlease wait...",
                                             true);
                                 }
                             });
@@ -264,9 +267,8 @@ public class RoutingFragment extends Fragment {
                                  for(int i=0; i < fromSuggestResults.size(); i++){
                                      fromSuggestGeocodedResult = locatorTask.geocodeAsync(fromSuggestResults.get(i)).get();
                                      if(fromSuggestGeocodedResult.size() > 0){
-                                         geocodedPoints.add(new Point(fromSuggestGeocodedResult.get(0).getRouteLocation().getX(),
+                                         fromGeocodedPoints.add(new Point(fromSuggestGeocodedResult.get(0).getRouteLocation().getX(),
                                                  fromSuggestGeocodedResult.get(0).getRouteLocation().getY(), SpatialReferences.getWgs84()
-
                                          ));
                                      }
                                  }
@@ -275,7 +277,7 @@ public class RoutingFragment extends Fragment {
                                     for(int i=0; i < 3; i++){
                                         fromSuggestGeocodedResult = locatorTask.geocodeAsync(fromSuggestResults.get(i)).get();
                                        if(fromSuggestGeocodedResult.size() > 0){
-                                           geocodedPoints.add(new Point(fromSuggestGeocodedResult.get(0).getRouteLocation().getX(),
+                                           fromGeocodedPoints.add(new Point(fromSuggestGeocodedResult.get(0).getRouteLocation().getX(),
                                                    fromSuggestGeocodedResult.get(0).getRouteLocation().getY(), SpatialReferences.getWgs84()
 
                                            ));
@@ -286,8 +288,6 @@ public class RoutingFragment extends Fragment {
                                 showMessage("Unable to geocode the specified origin.");
                             }
 
-
-
                             //do likewise for to location
                             List<SuggestResult> toSuggestResults = locatorTask.suggestAsync(toPoint, suggestParams).get();
                             List<GeocodeResult> toSuggestGeocodedResult;
@@ -296,24 +296,25 @@ public class RoutingFragment extends Fragment {
                                     for(int i=0; i < toSuggestResults.size(); i++){
                                         toSuggestGeocodedResult = locatorTask.geocodeAsync(toSuggestResults.get(i)).get();
                                         if(toSuggestGeocodedResult.size() >0){
-                                            geocodedPoints.add(new Point(toSuggestGeocodedResult.get(0).getRouteLocation().getX(),
+                                            toGeocodedPoints.add(new Point(toSuggestGeocodedResult.get(0).getRouteLocation().getX(),
                                                     toSuggestGeocodedResult.get(0).getRouteLocation().getY(),
                                                     SpatialReferences.getWgs84()));
                                         }
                                     }
                                 }
+
                                 if(toSuggestResults.size() > 3){
                                     for(int i=0; i < 3; i++){
                                         toSuggestGeocodedResult = locatorTask.geocodeAsync(toSuggestResults.get(i)).get();
                                        if(toSuggestGeocodedResult.size() >0){
-                                           geocodedPoints.add(new Point(toSuggestGeocodedResult.get(0).getRouteLocation().getX(),
+                                           toGeocodedPoints.add(new Point(toSuggestGeocodedResult.get(0).getRouteLocation().getX(),
                                                    toSuggestGeocodedResult.get(0).getRouteLocation().getY(),
                                                    SpatialReferences.getWgs84()));
                                        }
                                     }
                                 }
                                 progressDialog.dismiss();
-
+                                performRouting(fromGeocodedPoints, toGeocodedPoints);
                             }else{
                                 showMessage("Unable to geocode the specified destination.");
                             }
@@ -323,18 +324,18 @@ public class RoutingFragment extends Fragment {
                     }
                 }
             });
-
-            return geocodedPoints;
+            return fromGeocodedPoints;
         }
 
-        private synchronized void performRouting(final ArrayList<Point> arrayListOfGeocodes) {
-            //begin routing
-            Thread routeThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
+        /**
+         * Perform the routing process by using results from performGeocoding as the stops entered by the user.
+         * @param fromArrayList
+         */
+
+        private synchronized void performRouting(final ArrayList<Point> fromArrayList, final ArrayList<Point> toArrayList) {
+                    //begin routing
                     final RouteTask routeTask = new RouteTask(AGO_ROUTING_SERVICE);
                     routeTask.loadAsync();
-                    graphicsOverlay = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
                     routeTask.addDoneLoadingListener(new Runnable() {
                         @Override
                         public void run() {
@@ -353,9 +354,9 @@ public class RoutingFragment extends Fragment {
                                     routeParams.setReturnDirections(true);
                                     routeParams.setOutputSpatialReference(SpatialReferences.getWgs84());
                                     List<Stop> routeStops = routeParams.getStops();
-                                    if(arrayListOfGeocodes.size() != 0){
-                                        routeStops.add(new Stop(arrayListOfGeocodes.get(0)));
-                                        routeStops.add(new Stop(arrayListOfGeocodes.get(1)));
+                                    if(fromArrayList.size() != 0){
+                                        routeStops.add(new Stop(fromArrayList.get(0)));
+                                        routeStops.add(new Stop(toArrayList.get(0)));
                                     }
 
                                     //solve and retrieve the first route
@@ -371,32 +372,38 @@ public class RoutingFragment extends Fragment {
                                     routeGraphic.setSymbol(routeSymbol);
 
                                     //check if there are any previous routes on layer and clear it
-                                    if(graphicsOverlay.getGraphics().size() != 0){
-                                        for(int i=0; i < graphicsOverlay.getGraphics().size(); i++){
-                                            graphicsOverlay.getGraphics().remove(i);
-                                        }
-                                    }
+                                    MapView mapView = (MapView)getActivity().findViewById(R.id.nav_map_view);
+
+
                                     graphicsOverlay.getGraphics().add(routeGraphic);
 
 
                                     //construct origin and destination and add to layer
                                     PictureMarkerSymbol originMarkerSymbol = new PictureMarkerSymbol("http://static.arcgis.com/images/Symbols/Shapes/RedPin2LargeB.png");
-                                    originMarkerSymbol.setWidth(20);
+                                    originMarkerSymbol.setWidth(25);
                                     originMarkerSymbol.setHeight(35);
                                     originMarkerSymbol.loadAsync();
-                                    Graphic originGraphic = new Graphic(geocodedPoints.get(0), originMarkerSymbol);
+                                    Graphic originGraphic = new Graphic(fromGeocodedPoints.get(0), originMarkerSymbol);
                                     graphicsOverlay.getGraphics().add(originGraphic);
 
                                     PictureMarkerSymbol destinationMarkerSym = new PictureMarkerSymbol("http://static.arcgis.com/images/Symbols/Basic/CheckeredFlag.png");
                                     destinationMarkerSym.setHeight(30);
                                     destinationMarkerSym.setWidth(20);
                                     destinationMarkerSym.loadAsync();
-                                    Graphic destinationGraphic = new Graphic(geocodedPoints.get(1), destinationMarkerSym);
+                                    Graphic destinationGraphic = new Graphic(toGeocodedPoints.get(0), destinationMarkerSym);
                                     graphicsOverlay.getGraphics().add(destinationGraphic);
                                     getActivity().runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
                                             MapView routeMapView = (MapView)getActivity().findViewById(R.id.nav_map_view);
+                                            if(routeMapView.getGraphicsOverlays().contains(graphicsOverlay)){
+                                                if(graphicsOverlay.getGraphics().size() > 0){
+                                                    for(int i=0; i < graphicsOverlay.getGraphics().size(); i++){
+                                                        graphicsOverlay.getGraphics().remove(i);
+                                                    }
+                                                }
+                                                routeMapView.getGraphicsOverlays().remove(graphicsOverlay);
+                                            }
                                             routeMapView.getGraphicsOverlays().add(graphicsOverlay);
                                             routeFragmentView.findViewById(R.id.from_to_layout).setVisibility(View.GONE);
 
@@ -421,7 +428,7 @@ public class RoutingFragment extends Fragment {
                                             route_drawer_layout.addDrawerListener(new DrawerLayout.DrawerListener() {
                                                 @Override
                                                 public void onDrawerSlide(View drawerView, float slideOffset) {
-
+                                                    routeFragmentView.setVisibility(View.VISIBLE);
                                                 }
 
                                                 @Override
@@ -431,7 +438,7 @@ public class RoutingFragment extends Fragment {
 
                                                 @Override
                                                 public void onDrawerClosed(View drawerView) {
-                                                    routeFragmentView.setVisibility(View.INVISIBLE);
+                                                    routeFragmentView.setVisibility(View.GONE);
                                                 }
 
                                                 @Override
@@ -461,7 +468,6 @@ public class RoutingFragment extends Fragment {
                                         routeTask.getLoadStatus()==LoadStatus.NOT_LOADED||routeTask.getLoadStatus() == LoadStatus.LOADING){
                                     showMessage("Please wait... routing service is "+routeTask.getLoadStatus().toString());
                                     routeTask.retryLoadAsync();
-
                                 }
                             }catch(ExecutionException|InterruptedException inex){
                                 Log.d("KwasiRouteException ", inex.getMessage());
@@ -469,19 +475,14 @@ public class RoutingFragment extends Fragment {
 
                         }
                     });
-                }
-            });
-            routeThread.start();
+
+
         }
 
 
-        public synchronized  void performNavigation(){
-            ArrayList<Point> geocodedResults = performGeocoding();
-            if(geocodedResults.size() > 1){
-                performRouting(geocodedResults);
-            }else{
-                showMessage("Geocoding did not complete as expected.");
-            }
+        public void performNavigation() {
+
+            performGeocoding();
 
         }
 
