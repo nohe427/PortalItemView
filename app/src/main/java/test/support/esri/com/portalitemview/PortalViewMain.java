@@ -346,8 +346,8 @@ public class PortalViewMain extends AppCompatActivity
                     .commit();
         }else if(id==R.id.navigation_results_drawer){
             Fragment routingFragment = getSupportFragmentManager().findFragmentByTag("RoutingFrag");
-            DrawerLayout drawerLayout = (DrawerLayout)routingFragment.getView().findViewById(R.id.route_drawer_layout);
-            drawerLayout.openDrawer(GravityCompat.END);
+            routingFragment.getView().setVisibility(View.VISIBLE);
+            routingFragment.getView().findViewById(R.id.route_drawer_layout).setVisibility(View.VISIBLE);
         }
 
         return super.onOptionsItemSelected(item);

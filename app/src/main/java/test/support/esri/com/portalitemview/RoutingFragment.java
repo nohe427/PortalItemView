@@ -75,8 +75,8 @@ public class RoutingFragment extends Fragment {
     private DrawerLayout routeFragmentView;
     private FloatingActionButton floatingRouteButton;
 //    private final String AGO_ROUTING_SERVICE = "http://sampleserver3.arcgisonline.com/ArcGIS/rest/services/Network/USA/NAServer/Route";
-   // private final String AGO_ROUTING_SERVICE= "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
-    private final String AGO_ROUTING_SERVICE= "http://192.168.1.6:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
+    private final String AGO_ROUTING_SERVICE= "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
+//    private final String AGO_ROUTING_SERVICE= "http://192.168.1.6:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
 //    private final String AGO_ROUTING_SERVICE = "http://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
     private ProgressDialog progressDialog;
     private  Route route;
@@ -371,7 +371,6 @@ public class RoutingFragment extends Fragment {
                                     Symbol routeSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.BLUE, 4);
                                     routeGraphic.setSymbol(routeSymbol);
 
-                                    graphicsOverlay.getGraphics().add(routeGraphic);
 
 
                                     //construct origin and destination and add to layer
@@ -380,26 +379,28 @@ public class RoutingFragment extends Fragment {
                                     originMarkerSymbol.setHeight(35);
                                     originMarkerSymbol.loadAsync();
                                     Graphic originGraphic = new Graphic(fromGeocodedPoints.get(0), originMarkerSymbol);
-                                    //check for presence of graphic before adding
-                                    if(graphicsOverlay.getGraphics().contains(originGraphic)){
-                                        graphicsOverlay.getGraphics().remove(originGraphic);
-                                    }
-                                    graphicsOverlay.getGraphics().add(originGraphic);
+
 
                                     PictureMarkerSymbol destinationMarkerSym = new PictureMarkerSymbol("http://static.arcgis.com/images/Symbols/Basic/CheckeredFlag.png");
                                     destinationMarkerSym.setHeight(30);
                                     destinationMarkerSym.setWidth(20);
                                     destinationMarkerSym.loadAsync();
                                     Graphic destinationGraphic = new Graphic(toGeocodedPoints.get(0), destinationMarkerSym);
-                                    //check to see if graphic exists on overlay and clear it before adding
-                                    if(graphicsOverlay.getGraphics().contains(destinationGraphic)){
-                                        graphicsOverlay.getGraphics().remove(destinationGraphic);
+
+
+                                    //check for the presence of older graphics, clear them and add new ones
+                                    if(graphicsOverlay.getGraphics() != null){
+                                        graphicsOverlay.getGraphics().clear();
                                     }
                                     graphicsOverlay.getGraphics().add(destinationGraphic);
+                                    graphicsOverlay.getGraphics().add(originGraphic);
+                                    graphicsOverlay.getGraphics().add(routeGraphic);
+
                                     getActivity().runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
                                             MapView routeMapView = (MapView)getActivity().findViewById(R.id.nav_map_view);
+                                            //clear the map
                                             if(routeMapView.getGraphicsOverlays().contains(graphicsOverlay)){
                                                 routeMapView.getGraphicsOverlays().remove(graphicsOverlay);
                                             }
