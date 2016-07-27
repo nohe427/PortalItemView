@@ -273,8 +273,25 @@ public class PortalViewMain extends AppCompatActivity
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu){
+
+        for(int i=0; i < globalMenu.size(); i++){
+            if(globalMenu.getItem(i).getTitle().toString().equalsIgnoreCase("Show Navigation Results")){
+                //check to ensure the routing fragment is present
+                if(getSupportFragmentManager().findFragmentByTag("RoutingFrag") ==null){
+                    globalMenu.getItem(i).setEnabled(false);
+                }else{
+                    globalMenu.getItem(i).setEnabled(true);
+                }
+            }
+        }
+    return true;
+    }
+
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        //Inflate the menu; this adds items to the action bar if it is present.
         super.onCreateOptionsMenu(menu);
         globalMenu = menu;
         getMenuInflater().inflate(R.menu.navigator, globalMenu);
@@ -284,8 +301,6 @@ public class PortalViewMain extends AppCompatActivity
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(true);
         searchView.setSubmitButtonEnabled(true);
-        //check for the visibility on the basemap floating button and perform logic
-
         return true;
     }
 
@@ -347,7 +362,12 @@ public class PortalViewMain extends AppCompatActivity
         }else if(id==R.id.navigation_results_drawer){
             Fragment routingFragment = getSupportFragmentManager().findFragmentByTag("RoutingFrag");
             routingFragment.getView().setVisibility(View.VISIBLE);
+            DrawerLayout drawerLayout = (DrawerLayout)routingFragment.getView().findViewById(R.id.route_drawer_layout);
+            drawerLayout.openDrawer(GravityCompat.END);
             routingFragment.getView().findViewById(R.id.route_drawer_layout).setVisibility(View.VISIBLE);
+
+
+
         }
 
         return super.onOptionsItemSelected(item);
