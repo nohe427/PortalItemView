@@ -3,6 +3,7 @@ package test.support.esri.com.portalitemview;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
+import android.location.Criteria;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -27,6 +28,8 @@ import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.geometry.Polyline;
 import com.esri.arcgisruntime.geometry.SpatialReferences;
 import com.esri.arcgisruntime.loadable.LoadStatus;
+import com.esri.arcgisruntime.location.AndroidLocationDataSource;
+import com.esri.arcgisruntime.location.LocationDataSource;
 import com.esri.arcgisruntime.mapping.view.Graphic;
 import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
 import com.esri.arcgisruntime.mapping.view.LocationDisplay;
@@ -76,8 +79,8 @@ public class RoutingFragment extends Fragment {
     private DrawerLayout routeFragmentView;
     private FloatingActionButton floatingRouteButton;
 //    private final String AGO_ROUTING_SERVICE = "http://sampleserver3.arcgisonline.com/ArcGIS/rest/services/Network/USA/NAServer/Route";
-    private final String AGO_ROUTING_SERVICE= "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
-//    private final String AGO_ROUTING_SERVICE= "http://192.168.1.6:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
+//    private final String AGO_ROUTING_SERVICE= "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
+    private final String AGO_ROUTING_SERVICE= "http://192.168.1.6:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
 //    private final String AGO_ROUTING_SERVICE = "http://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
     private ProgressDialog progressDialog;
     private  Route route;
@@ -356,6 +359,7 @@ public class RoutingFragment extends Fragment {
                                     routeParams.setLocalStartTime(Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles")));
                                     routeParams.setReturnDirections(true);
                                     routeParams.setOutputSpatialReference(SpatialReferences.getWgs84());
+                                    routeParams.setReturnStops(true);
                                     List<Stop> routeStops = routeParams.getStops();
                                     if(fromArrayList.size() != 0 && toArrayList.size() !=0){
                                         routeStops.add(new Stop(fromArrayList.get(0)));
@@ -464,7 +468,7 @@ public class RoutingFragment extends Fragment {
                                                 @Override
                                                 public void onClick(View v) {
                                                     route_drawer_layout.closeDrawer(GravityCompat.END);
-
+                                                    beingNavigation();
                                                     if(textToSpeech != null) {
                                                         for (int i = 0; i < directionManeuvers.size(); i++) {
                                                             textToSpeech.speak(directionManeuvers.get(i).getDirectionText(), TextToSpeech.QUEUE_ADD,
@@ -498,13 +502,52 @@ public class RoutingFragment extends Fragment {
 
         void beingNavigation(){
         //obtain location display manager
-            LocationDisplay locationdisplayManager = routeMapView.getLocationDisplay();
-            locationdisplayManager.addLocationChangedListener(new LocationDisplay.LocationChangedListener() {
+            LocationDisplay locationDisplay = routeMapView.getLocationDisplay();
+            locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.NAVIGATION);
+            //zoom to the location displayed on the map
+            routeMapView.setViewpointCenterAsync(locationDisplay.getMapLocation());
+            Criteria criteria = new Criteria();
+            criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+            criteria.setBearingRequired(true);
+            criteria.setBearingAccuracy(Criteria.ACCURACY_LOW);
+            criteria.setSpeedAccuracy(Criteria.ACCURACY_LOW);
+            criteria.setSpeedRequired(true);
+            AndroidLocationDataSource androidLocationDataSource = new AndroidLocationDataSource(getContext(), criteria, 2000, 1);
+            androidLocationDataSource.startAsync();
+            androidLocationDataSource.addStartedListener(new Runnable() {
+                @Override
+                public void run() {
+                    showMessage("Beginning navigation...");
+                }
+            });
+            locationDisplay.startAsync();
+            locationDisplay.setLocationDataSource(androidLocationDataSource);
+            locationDisplay.addLocationChangedListener(new LocationDisplay.LocationChangedListener() {
                 @Override
                 public void onLocationChanged(LocationDisplay.LocationChangedEvent locationChangedEvent) {
                     Point locationPoint = locationChangedEvent.getLocation().getPosition();
+                    routeMapView.setViewpointCenterWithScaleAsync(locationPoint, 200);
                 }
             });
+        }
+    }
+
+    //extend LocationDatasource to implement onStart method and onStop methods
+
+    class PortalViewLocationDatasource extends LocationDataSource {
+
+        public PortalViewLocationDatasource(){
+            super();
+        }
+
+        @Override
+        protected void onStart() {
+
+        }
+
+        @Override
+        protected void onStop() {
+
         }
     }
     // TODO: Rename method, update argument and hook method into UI event
