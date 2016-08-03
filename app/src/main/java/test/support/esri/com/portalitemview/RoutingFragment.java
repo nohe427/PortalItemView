@@ -135,8 +135,6 @@ public class RoutingFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         routeFragmentView = (DrawerLayout) inflater.inflate(R.layout.fragment_routing, container, false);
-        routeFragmentView.findViewById(R.id.directions_indicator).setVisibility(View.INVISIBLE);
-        routeFragmentView.findViewById(R.id.routes_indicator).setVisibility(View.INVISIBLE);
         floatingRouteButton = (FloatingActionButton)routeFragmentView.findViewById(R.id.router);
         floatingRouteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -460,7 +458,6 @@ public class RoutingFragment extends Fragment {
                                                     +"Duration: "+convertMinutesToHoursMins(route.getTotalTime()));
                                             TextView totalDistance = (TextView)routeFragmentView.findViewById(R.id.time_of_travel);
                                             totalDistance.setText("Distance: "+convertMetersToMiles(route.getTotalLength())+ " mi");
-                                            routeFragmentView.findViewById(R.id.directions_indicator).setVisibility(View.VISIBLE);
                                             route_drawer_layout.openDrawer(GravityCompat.END);
                                             route_drawer_layout.addDrawerListener(new DrawerLayout.DrawerListener() {
                                                 @Override
@@ -481,6 +478,7 @@ public class RoutingFragment extends Fragment {
                                                 @Override
                                                 public void onDrawerStateChanged(int newState) {
                                                     if(route_drawer_layout.getVisibility() == View.INVISIBLE){
+
                                                         route_drawer_layout.setVisibility(View.VISIBLE);
                                                     }
                                                 }
@@ -552,11 +550,26 @@ public class RoutingFragment extends Fragment {
                 public void onLocationChanged(LocationDisplay.LocationChangedEvent locationChangedEvent) {
                     Point locationPoint = locationChangedEvent.getLocation().getPosition();
                     routeMapView.setViewpointCenterWithScaleAsync(locationPoint, 60000);
+                    //set the route indicators
+                    ((TextView)getActivity().findViewById(R.id.mph)).setText(String.valueOf(locationChangedEvent.getLocation().getVelocity())+ "\nmph");
+
+                    if(route != null){
+                        double travelTime = route.getTravelTime();
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.add(Calendar.HOUR_OF_DAY, (int)travelTime);
+                        ((TextView)getActivity().findViewById(R.id.arrival)).setText(calendar.get(Calendar.HOUR_OF_DAY) + " : "+calendar.get(Calendar.MINUTE) +"\narrival");
+                        ((TextView)getActivity().findViewById(R.id.travel_time)).setText(String.valueOf(convertMinutesToHoursMins(route.getTravelTime())) +"\n travel time");
+                        getActivity().findViewById(R.id.location_floater).setVisibility(View.INVISIBLE);
+                    }
+
                 }
             });
 
-            routeFragmentView.findViewById(R.id.routes_indicator).setVisibility(View.VISIBLE);
-            routeFragmentView.findViewById(R.id.directions_indicator).setVisibility(View.VISIBLE);
+            //show the directions and routes indicator on the main activity
+            getActivity().findViewById(R.id.routes_indicator).setVisibility(View.VISIBLE);
+
+
+            getActivity().findViewById(R.id.directions_indicator).setVisibility(View.VISIBLE);
         }
 
 

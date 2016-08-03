@@ -36,6 +36,7 @@ import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.Basemap;
 import com.esri.arcgisruntime.mapping.LayerList;
+import com.esri.arcgisruntime.mapping.Viewpoint;
 import com.esri.arcgisruntime.mapping.view.Callout;
 import com.esri.arcgisruntime.mapping.view.DefaultMapViewOnTouchListener;
 import com.esri.arcgisruntime.mapping.view.DrawStatus;
@@ -71,6 +72,8 @@ public class PortalViewMain extends AppCompatActivity
     private SearchView searchView;
     private RelativeLayout relativeLayout;
     public static MapViewSingleClick singleClick;
+
+
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +83,9 @@ public class PortalViewMain extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         navMapView = (MapView) findViewById(R.id.nav_map_view);
-        navigationMap = new ArcGISMap(Basemap.createLightGrayCanvas());
+        navigationMap = new ArcGISMap(Basemap.createImageryWithLabels());
         navMapView.setMap(navigationMap);
+        navMapView.setViewpoint(navMapView.getCurrentViewpoint(Viewpoint.Type.BOUNDING_GEOMETRY));
         navMapView.setMagnifierEnabled(true);
         navMapView.setCanMagnifierPanMap(true);
 
@@ -90,7 +94,6 @@ public class PortalViewMain extends AppCompatActivity
         callout = navMapView.getCallout();
          relativeLayout = (RelativeLayout) LayoutInflater.from(getApplicationContext()).inflate(
                 R.layout.callout_layout, null
-
         );
 
         callout.setContent(relativeLayout);
