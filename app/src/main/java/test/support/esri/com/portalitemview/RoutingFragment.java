@@ -549,18 +549,35 @@ public class RoutingFragment extends Fragment {
                 @Override
                 public void onLocationChanged(LocationDisplay.LocationChangedEvent locationChangedEvent) {
                     Point locationPoint = locationChangedEvent.getLocation().getPosition();
-                    routeMapView.setViewpointCenterWithScaleAsync(locationPoint, 60000);
+                    routeMapView.setViewpointCenterWithScaleAsync(locationPoint, 10000);
                     //set the route indicators
-                    ((TextView)getActivity().findViewById(R.id.mph)).setText(String.valueOf(locationChangedEvent.getLocation().getVelocity())+ "\nmph");
-
+                    DecimalFormat decimalFormat = new DecimalFormat("##.##");
+                    ((TextView)getActivity().findViewById(R.id.mph)).setText(String.valueOf(decimalFormat.format(locationChangedEvent.getLocation().getVelocity()))+ "\nm/s");
                     if(route != null){
-                        double travelTime = route.getTravelTime();
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.add(Calendar.HOUR_OF_DAY, (int)travelTime);
-                        ((TextView)getActivity().findViewById(R.id.arrival)).setText(calendar.get(Calendar.HOUR_OF_DAY) + " : "+calendar.get(Calendar.MINUTE) +"\narrival");
+                        int counter = 0;
+                        //check to make sure the location is the same at the maneuver point
+                        //and change the arrival time
+                        if(route.getDirectionManeuvers().get(counter).getDirectionEvents().size() >0) {
+                            ((TextView) getActivity().findViewById(R.id.arrival)).setText(
+                                    route.getDirectionManeuvers().get(counter).getDirectionEvents().get(0).getEstimatedLocalArrivalTime().get(Calendar.HOUR) + " : " +
+                                            route.getDirectionManeuvers().get(counter).getDirectionEvents().get(0).getEstimatedLocalArrivalTime().get(Calendar.MINUTE) + "\narrival");
+                            if (!route.getDirectionManeuvers().get(counter).getDirectionEvents().get(0).getGeometry().equals(locationPoint)) {
+                                counter = counter;
+                            } else {
+                                counter++;
+                            }
+                        }else {
+                            int lastStopIndex = route.getStops().size() -1;
+
+                            ((TextView) getActivity().findViewById(R.id.arrival)).setText(route.getStops().get(lastStopIndex).getLocalArrivalTime().get(Calendar.HOUR)+":"+
+                                    route.getStops().get(lastStopIndex).getLocalArrivalTime().get(Calendar.MINUTE) + "\n ETA");
+                        }
                         ((TextView)getActivity().findViewById(R.id.travel_time)).setText(String.valueOf(convertMinutesToHoursMins(route.getTravelTime())) +"\n travel time");
                         getActivity().findViewById(R.id.location_floater).setVisibility(View.INVISIBLE);
                     }
+
+                    ((TextView)getActivity().findViewById(R.id.distance_dir)).setText(String.valueOf(locationChangedEvent.getLocation().getCourse()));
+                    ((TextView)getActivity().findViewById(R.id.upcoming_turn)).setText(String.valueOf(locationChangedEvent.getSource().getHeading()));
 
                 }
             });

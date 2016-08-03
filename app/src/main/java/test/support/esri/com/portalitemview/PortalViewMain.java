@@ -32,11 +32,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.esri.arcgisruntime.geometry.Point;
+import com.esri.arcgisruntime.layers.ArcGISTiledLayer;
 import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.Basemap;
 import com.esri.arcgisruntime.mapping.LayerList;
-import com.esri.arcgisruntime.mapping.Viewpoint;
 import com.esri.arcgisruntime.mapping.view.Callout;
 import com.esri.arcgisruntime.mapping.view.DefaultMapViewOnTouchListener;
 import com.esri.arcgisruntime.mapping.view.DrawStatus;
@@ -83,9 +83,20 @@ public class PortalViewMain extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         navMapView = (MapView) findViewById(R.id.nav_map_view);
-        navigationMap = new ArcGISMap(Basemap.createImageryWithLabels());
+
+        Basemap basemap = new Basemap();
+        final ArcGISTiledLayer arcGISVectorTiledLayer = new ArcGISTiledLayer("http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Dark_Gray_Base/MapServer");
+        arcGISVectorTiledLayer.loadAsync();
+        basemap.getBaseLayers().add(arcGISVectorTiledLayer);
+        basemap.loadAsync();
+        navigationMap = new ArcGISMap(basemap);
         navMapView.setMap(navigationMap);
-        navMapView.setViewpoint(navMapView.getCurrentViewpoint(Viewpoint.Type.BOUNDING_GEOMETRY));
+        arcGISVectorTiledLayer.addDoneLoadingListener(new Runnable() {
+            @Override
+            public void run() {
+                navMapView.setViewpointGeometryAsync(arcGISVectorTiledLayer.getFullExtent());
+            }
+        });
         navMapView.setMagnifierEnabled(true);
         navMapView.setCanMagnifierPanMap(true);
 

@@ -33,7 +33,7 @@
             android:textColor="@color/abc_primary_text_material_dark"
             android:layout_centerVertical="true"
             android:layout_alignParentStart="true"
-            android:layout_marginStart="24dp" />
+            android:layout_marginStart="24dp"/>
         <TextView
             android:id="@+id/arrival"
             android:textStyle="bold"
@@ -44,8 +44,8 @@
             android:textColor="@color/abc_primary_text_material_dark"
             android:layout_marginLeft="23dp"
             android:layout_alignTop="@+id/mph"
-            android:layout_toStartOf="@+id/travel_time"
-            android:layout_marginEnd="39dp" />
+            android:layout_toEndOf="@+id/mph"
+            android:layout_marginStart="69dp" />
         <TextView
             android:id="@+id/travel_time"
             android:text="@string/travel_time"

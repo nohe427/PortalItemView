@@ -57,6 +57,6 @@
     <string name="direction_option">direction option</string>
     <string name="title_activity_geocode">GeocodeActivity</string>
     <string name="mph">speed</string>
-    <string name="arrival">arrival</string>
+    <string name="arrival">ETA</string>
     <string name="travel_time">travel time</string>
 </resources>
