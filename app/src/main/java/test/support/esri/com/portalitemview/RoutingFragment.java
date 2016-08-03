@@ -1,7 +1,9 @@
 package test.support.esri.com.portalitemview;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Criteria;
 import android.net.Uri;
@@ -10,6 +12,7 @@ import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -79,8 +82,8 @@ public class RoutingFragment extends Fragment {
     private DrawerLayout routeFragmentView;
     private FloatingActionButton floatingRouteButton;
 //    private final String AGO_ROUTING_SERVICE = "http://sampleserver3.arcgisonline.com/ArcGIS/rest/services/Network/USA/NAServer/Route";
-//    private final String AGO_ROUTING_SERVICE= "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
-    private final String AGO_ROUTING_SERVICE= "http://192.168.1.6:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
+    private final String AGO_ROUTING_SERVICE= "http://csc-kasante7l3.esri.com:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
+//    private final String AGO_ROUTING_SERVICE= "http://192.168.1.6:6080/arcgis/rest/services/Routing/Routing/NAServer/Route";
 //    private final String AGO_ROUTING_SERVICE = "http://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
     private ProgressDialog progressDialog;
     private  Route route;
@@ -89,6 +92,9 @@ public class RoutingFragment extends Fragment {
     private TextToSpeech textToSpeech;
     private Switch switcher;
     private GraphicsOverlay graphicsOverlay = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
+
+    private MapView routeMapView;
+    private LocationDisplay locationDisplay;
 
     //private final String AGO_ROUTING_SERVICE= "http://sampleserver3.arcgisonline.com/ArcGIS/rest/services/Network/USA/NAServer/Route";
 
@@ -129,7 +135,8 @@ public class RoutingFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         routeFragmentView = (DrawerLayout) inflater.inflate(R.layout.fragment_routing, container, false);
-
+        routeFragmentView.findViewById(R.id.directions_indicator).setVisibility(View.INVISIBLE);
+        routeFragmentView.findViewById(R.id.routes_indicator).setVisibility(View.INVISIBLE);
         floatingRouteButton = (FloatingActionButton)routeFragmentView.findViewById(R.id.router);
         floatingRouteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,6 +154,9 @@ public class RoutingFragment extends Fragment {
         actionBarDrawerToggle.syncState();*/
 
 
+        //initialize the mapview and the location display
+        routeMapView = (MapView)getActivity().findViewById(R.id.nav_map_view);
+        locationDisplay = routeMapView.getLocationDisplay();
 
 
         //implement logic for the initialization of speech
@@ -187,6 +197,17 @@ public class RoutingFragment extends Fragment {
     }
 
 
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permission, int[] grantResults){
+        if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            locationDisplay.startAsync();
+            locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.NAVIGATION);
+        }
+    }
+
+
+
     /**
      * Inner class for performing geocoding and routing on background thread
      *
@@ -196,7 +217,7 @@ public class RoutingFragment extends Fragment {
     public class RoutingFragAsyncTask extends AsyncTask<Void, Void, Void>{
         ArrayList<Point> fromGeocodedPoints;
         ArrayList<Point> toGeocodedPoints;
-        private MapView routeMapView;
+
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -410,13 +431,13 @@ public class RoutingFragment extends Fragment {
                                     getActivity().runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            routeMapView = (MapView)getActivity().findViewById(R.id.nav_map_view);
+//                                            routeMapView = (MapView)getActivity().findViewById(R.id.nav_map_view);
                                             //clear the map
                                             if(routeMapView.getGraphicsOverlays().contains(graphicsOverlay)){
                                                 routeMapView.getGraphicsOverlays().remove(graphicsOverlay);
                                             }
                                             routeMapView.getGraphicsOverlays().add(graphicsOverlay);
-                                            routeFragmentView.findViewById(R.id.from_to_layout).setVisibility(View.GONE);
+//                                            routeFragmentView.findViewById(R.id.from_to_layout).setVisibility(View.GONE);
 
                                             routeMapView.setViewpointGeometryWithPaddingAsync(routeLines, 150);
                                             progressDialog.dismiss();
@@ -439,11 +460,12 @@ public class RoutingFragment extends Fragment {
                                                     +"Duration: "+convertMinutesToHoursMins(route.getTotalTime()));
                                             TextView totalDistance = (TextView)routeFragmentView.findViewById(R.id.time_of_travel);
                                             totalDistance.setText("Distance: "+convertMetersToMiles(route.getTotalLength())+ " mi");
+                                            routeFragmentView.findViewById(R.id.directions_indicator).setVisibility(View.VISIBLE);
                                             route_drawer_layout.openDrawer(GravityCompat.END);
                                             route_drawer_layout.addDrawerListener(new DrawerLayout.DrawerListener() {
                                                 @Override
                                                 public void onDrawerSlide(View drawerView, float slideOffset) {
-                                                    routeFragmentView.setVisibility(View.VISIBLE);
+                                                //route_drawer_layout.setVisibility(View.VISIBLE);
                                                 }
 
                                                 @Override
@@ -468,7 +490,7 @@ public class RoutingFragment extends Fragment {
                                                 @Override
                                                 public void onClick(View v) {
                                                     route_drawer_layout.closeDrawer(GravityCompat.END);
-                                                    beingNavigation();
+                                                    beginNavigation();
                                                     if(textToSpeech != null) {
                                                         for (int i = 0; i < directionManeuvers.size(); i++) {
                                                             textToSpeech.speak(directionManeuvers.get(i).getDirectionText(), TextToSpeech.QUEUE_ADD,
@@ -499,20 +521,24 @@ public class RoutingFragment extends Fragment {
             performGeocoding();
         }
 
-
-        void beingNavigation(){
-        //obtain location display manager
-            LocationDisplay locationDisplay = routeMapView.getLocationDisplay();
-            locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.NAVIGATION);
+        void beginNavigation(){
+            //obtain location display manager
+           if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) ==
+                   PackageManager.PERMISSION_GRANTED){
+               locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.NAVIGATION);
+               locationDisplay.startAsync();
+           }else {
+               requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+           }
             //zoom to the location displayed on the map
-            routeMapView.setViewpointCenterAsync(locationDisplay.getMapLocation());
             Criteria criteria = new Criteria();
             criteria.setAccuracy(Criteria.ACCURACY_COARSE);
             criteria.setBearingRequired(true);
             criteria.setBearingAccuracy(Criteria.ACCURACY_LOW);
             criteria.setSpeedAccuracy(Criteria.ACCURACY_LOW);
             criteria.setSpeedRequired(true);
-            AndroidLocationDataSource androidLocationDataSource = new AndroidLocationDataSource(getContext(), criteria, 2000, 1);
+            AndroidLocationDataSource androidLocationDataSource =
+                    new AndroidLocationDataSource(getContext(), criteria, 2000, 1);
             androidLocationDataSource.startAsync();
             androidLocationDataSource.addStartedListener(new Runnable() {
                 @Override
@@ -520,17 +546,23 @@ public class RoutingFragment extends Fragment {
                     showMessage("Beginning navigation...");
                 }
             });
-            locationDisplay.startAsync();
             locationDisplay.setLocationDataSource(androidLocationDataSource);
             locationDisplay.addLocationChangedListener(new LocationDisplay.LocationChangedListener() {
                 @Override
                 public void onLocationChanged(LocationDisplay.LocationChangedEvent locationChangedEvent) {
                     Point locationPoint = locationChangedEvent.getLocation().getPosition();
-                    routeMapView.setViewpointCenterWithScaleAsync(locationPoint, 200);
+                    routeMapView.setViewpointCenterWithScaleAsync(locationPoint, 60000);
                 }
             });
+
+            routeFragmentView.findViewById(R.id.routes_indicator).setVisibility(View.VISIBLE);
+            routeFragmentView.findViewById(R.id.directions_indicator).setVisibility(View.VISIBLE);
         }
+
+
     }
+
+
 
     //extend LocationDatasource to implement onStart method and onStop methods
 

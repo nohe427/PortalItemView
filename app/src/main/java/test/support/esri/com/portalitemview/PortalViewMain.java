@@ -146,15 +146,19 @@ public class PortalViewMain extends AppCompatActivity
                     locationDisplay.startAsync();
                 } else {
                     requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-                    if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) ==
-                            PackageManager.PERMISSION_GRANTED) {
-                        LocationDisplay locationDisplay = navMapView.getLocationDisplay();
-                        locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.NAVIGATION);
-                        locationDisplay.startAsync();
-                    }
+                   /* if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+                            PackageManager.PERMISSION_GRANTED) {*/
+                    int[] intArray = {PackageManager.PERMISSION_GRANTED};
+                    onRequestPermissionsResult(1, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, intArray);
+                    LocationDisplay locationDisplay = navMapView.getLocationDisplay();
+                    locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.NAVIGATION);
+                    locationDisplay.startAsync();
+               // }
                 }
             }
         });
+
+
 
 
         //implement event handler for map content changes
@@ -180,6 +184,15 @@ public class PortalViewMain extends AppCompatActivity
 
 
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permission, int[] grantResults){
+
+        if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            LocationDisplay locationDisplay =navMapView.getLocationDisplay();
+            locationDisplay.startAsync();
+        }
     }
 
 
@@ -365,9 +378,6 @@ public class PortalViewMain extends AppCompatActivity
             DrawerLayout drawerLayout = (DrawerLayout)routingFragment.getView().findViewById(R.id.route_drawer_layout);
             drawerLayout.openDrawer(GravityCompat.END);
             routingFragment.getView().findViewById(R.id.route_drawer_layout).setVisibility(View.VISIBLE);
-
-
-
         }
 
         return super.onOptionsItemSelected(item);
@@ -439,10 +449,6 @@ public class PortalViewMain extends AppCompatActivity
 
 
     public void enterNavigationMode() {
-        LocationDisplay locationDisplay = navMapView.getLocationDisplay();
-        locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.NAVIGATION);
-        locationDisplay.startAsync();
-
         //check to see if the fragment is already initialized before doing anything else
         //this ensures we work with the same objects and not reinitialize them
         Fragment routingFragment = getSupportFragmentManager().findFragmentByTag("RoutingFrag");
