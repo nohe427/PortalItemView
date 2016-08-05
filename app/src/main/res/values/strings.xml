@@ -59,4 +59,5 @@
     <string name="mph">speed</string>
     <string name="arrival">ETA</string>
     <string name="travel_time">travel time</string>
+    <string name="rememeber_me">Remember me</string>
 </resources>

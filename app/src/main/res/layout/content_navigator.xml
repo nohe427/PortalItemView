@@ -34,6 +34,14 @@
             android:layout_centerVertical="true"
             android:layout_alignParentStart="true"
             android:layout_marginStart="24dp"/>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/bright_foreground_material_dark"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@+id/travel_time"
+            android:layout_marginEnd="32dp" />
         <TextView
             android:id="@+id/arrival"
             android:textStyle="bold"
@@ -45,7 +53,16 @@
             android:layout_marginLeft="23dp"
             android:layout_alignTop="@+id/mph"
             android:layout_toEndOf="@+id/mph"
-            android:layout_marginStart="69dp" />
+            android:layout_marginStart="69dp"
+            />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/bright_foreground_material_dark"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/mph"
+            android:layout_marginStart="28dp"/>
         <TextView
             android:id="@+id/travel_time"
             android:text="@string/travel_time"
@@ -74,7 +91,8 @@
             android:src="@mipmap/turn"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:contentDescription="turn imagery" />
+            android:contentDescription="turn imagery"
+            android:visibility="invisible"/>
         <TextView
             android:id="@+id/distance_dir"
             android:text="@string/accept"

@@ -551,7 +551,7 @@ public class RoutingFragment extends Fragment {
                     Point locationPoint = locationChangedEvent.getLocation().getPosition();
                     routeMapView.setViewpointCenterWithScaleAsync(locationPoint, 10000);
                     //set the route indicators
-                    DecimalFormat decimalFormat = new DecimalFormat("##.##");
+                    DecimalFormat decimalFormat = new DecimalFormat("0.##");
                     ((TextView)getActivity().findViewById(R.id.mph)).setText(String.valueOf(decimalFormat.format(locationChangedEvent.getLocation().getVelocity()))+ "\nm/s");
                     if(route != null){
                         int counter = 0;
@@ -577,7 +577,7 @@ public class RoutingFragment extends Fragment {
                     }
 
                     ((TextView)getActivity().findViewById(R.id.distance_dir)).setText(String.valueOf(locationChangedEvent.getLocation().getCourse()));
-                    ((TextView)getActivity().findViewById(R.id.upcoming_turn)).setText(String.valueOf(locationChangedEvent.getSource().getHeading()));
+                    ((TextView)getActivity().findViewById(R.id.upcoming_turn)).setText("Heading: "+String.valueOf(locationChangedEvent.getSource().getHeading()));
 
                 }
             });

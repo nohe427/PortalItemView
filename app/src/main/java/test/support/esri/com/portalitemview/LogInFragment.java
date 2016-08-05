@@ -2,6 +2,7 @@ package test.support.esri.com.portalitemview;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
@@ -34,8 +36,9 @@ public class LogInFragment extends Fragment {
     private String username;
     private String password;
     private String portalURL;
-    Button resetButton;
+    private SharedPreferences sharedPreferences;
     Button loginButton;
+    CheckBox remember_me;
     static EditText txtUsername;
     static EditText txtPassword;
     private View mainView;
@@ -43,7 +46,8 @@ public class LogInFragment extends Fragment {
     private RadioButton radio_arcgis;
     private EditText txtPortalURL;
     private Bundle argBundle;
-
+    private SharedPreferences.Editor sharedPreferences_edit;
+    private static boolean sharePreferencesState = false;
 
 
     public LogInFragment() {
@@ -112,12 +116,22 @@ public class LogInFragment extends Fragment {
                 isPortalChecked = true;
         }
 
-        username = txtUsername.getText().toString().trim();
-        password = txtPassword.getText().toString().trim();
-        portalURL = txtPortalURL.getText().toString().trim();
-        argBundle = new Bundle();
-        argBundle.putString("USERNAME", username);
-        argBundle.putString("PASSWORD", password);
+
+        if(sharedPreferences != null){
+            username = sharedPreferences.getString(USERNAME, null);
+            password = sharedPreferences.getString(PASSWORD, null);
+            portalURL = txtPortalURL.getText().toString().trim();
+            argBundle = new Bundle();
+            argBundle.putString("USERNAME", username);
+            argBundle.putString("PASSWORD", password);
+        }else {
+            username = txtUsername.getText().toString().trim();
+            password = txtPassword.getText().toString().trim();
+            portalURL = txtPortalURL.getText().toString().trim();
+            argBundle = new Bundle();
+            argBundle.putString("USERNAME", username);
+            argBundle.putString("PASSWORD", password);
+        }
         argBundle.putString("FRAGMENTTAG", "portal_view_fragment");
         argBundle.putBoolean("isPortalChecked", isPortalChecked);
         argBundle.putString("portalURL", portalURL);
@@ -136,23 +150,37 @@ public class LogInFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
-      mainView = inflater.inflate(R.layout.log_in_fragment, container, false);
-        resetButton = (Button)mainView.findViewById(R.id.resetbutton);
+        mainView = inflater.inflate(R.layout.log_in_fragment, container, false);
         loginButton = (Button)mainView.findViewById(R.id.loginbutton);
         txtUsername = (EditText)mainView.findViewById(R.id.portal_username);
         txtPassword = (EditText)mainView.findViewById(R.id.portal_password);
         radio_arcgis = (RadioButton)mainView.findViewById(R.id.radio_arcgis);
         radio_portal = (RadioButton)mainView.findViewById(R.id.radio_portal);
         txtPortalURL = (EditText)mainView.findViewById(R.id.portal_url);
-        txtPortalURL.setVisibility(View.GONE);
-        radio_arcgis.setChecked(true);
-        resetButton.setOnClickListener(new View.OnClickListener() {
+        remember_me = (CheckBox)mainView.findViewById(R.id.remember_me);
+
+        remember_me.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                txtUsername.setText("");
-                txtPassword.setText("");
+
             }
         });
+
+        if(remember_me.isChecked()){
+            sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+            sharedPreferences_edit = sharedPreferences.edit();
+            sharedPreferences_edit.putString(PASSWORD, txtPassword.getText().toString());
+            sharedPreferences_edit.putString(USERNAME, txtUsername.getText().toString());
+            sharedPreferences_edit.commit();
+            sharePreferencesState = true;
+        }
+
+
+        if(sharePreferencesState){
+            remember_me.setChecked(true);
+        }
+        txtPortalURL.setVisibility(View.GONE);
+        radio_arcgis.setChecked(true);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -189,6 +217,8 @@ public class LogInFragment extends Fragment {
 
         return  mainView;
     }
+
+
 
 
 
